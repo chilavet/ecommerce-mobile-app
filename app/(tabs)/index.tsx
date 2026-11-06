@@ -1,31 +1,300 @@
-import { StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
+import { Product, Category } from '@/src/types';
+import { getProducts, getCategories } from '@/src/database/db';
+import { ProductCard } from '@/src/components/ProductCard';
+import { CategoryPill } from '@/src/components/CategoryPill';
+import { SearchBar } from '@/src/components/SearchBar';
+import { useAuth } from '@/src/context/AuthContext';
 
-export default function TabOneScreen() {
+export default function ShopHomeScreen() {
+  const { user } = useAuth();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('cat_all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const loadData = async () => {
+    try {
+      const [cats, prods, featured] = await Promise.all([
+        getCategories(),
+        getProducts({ categoryId: selectedCategoryId, query: searchQuery }),
+        getProducts({ featuredOnly: true }),
+      ]);
+      setCategories(cats);
+      setProducts(prods);
+      setFeaturedProducts(featured);
+    } catch (err) {
+      console.error('Error loading home data:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [selectedCategoryId, searchQuery]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadData();
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    >
+      {/* Header Greeting */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Welcome back,</Text>
+          <Text style={styles.userName}>{user ? user.name : 'Guest Shopper'} 👋</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.notificationBtn}
+          onPress={() => router.push('/(tabs)/orders')}
+        >
+          <Ionicons name="notifications-outline" size={22} color={Colors.light.text} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Search Bar */}
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        onClear={() => setSearchQuery('')}
+        onFilterPress={() => router.push('/(tabs)/explore')}
+      />
+
+      {/* Hero Promo Banner */}
+      <View style={[styles.banner, Shadows.md]}>
+        <View style={styles.bannerBadge}>
+          <Text style={styles.bannerBadgeText}>LIMITED OFFER</Text>
+        </View>
+        <Text style={styles.bannerTitle}>Up to 20% OFF Everything</Text>
+        <Text style={styles.bannerSubtitle}>Use promo code SAVE20 at checkout</Text>
+        <TouchableOpacity
+          style={styles.bannerBtn}
+          onPress={() => router.push('/(tabs)/explore')}
+        >
+          <Text style={styles.bannerBtnText}>Shop Now</Text>
+          <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Categories Horizontal Scroll */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Categories</Text>
+      </View>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.categoriesList}
+      >
+        {categories.map(category => (
+          <CategoryPill
+            key={category.id}
+            category={category}
+            isSelected={selectedCategoryId === category.id}
+            onSelect={() => setSelectedCategoryId(category.id)}
+          />
+        ))}
+      </ScrollView>
+
+      {/* Featured Items */}
+      {featuredProducts.length > 0 && searchQuery.length === 0 && selectedCategoryId === 'cat_all' && (
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Featured Deals 🔥</Text>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
+              <Text style={styles.seeAllText}>See All</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {featuredProducts.map(product => (
+              <View key={product.id} style={{ width: 260, marginRight: 14 }}>
+                <ProductCard product={product} />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      )}
+
+      {/* Main Product Grid */}
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>
+            {searchQuery ? `Search Results (${products.length})` : 'Popular Products'}
+          </Text>
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 20 }} />
+        ) : products.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Ionicons name="search-outline" size={48} color={Colors.light.textMuted} />
+            <Text style={styles.emptyTitle}>No products found</Text>
+            <Text style={styles.emptySubtitle}>Try adjusting your search terms or filter.</Text>
+          </View>
+        ) : (
+          <View style={styles.productGrid}>
+            {products.map(product => (
+              <View key={product.id} style={styles.gridItem}>
+                <ProductCard product={product} />
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.light.background,
+  },
+  contentContainer: {
+    padding: Spacing.md,
+    paddingBottom: 40,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  greeting: {
+    fontSize: 13,
+    color: Colors.light.textSecondary,
+    fontWeight: '500',
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: Colors.light.text,
+  },
+  notificationBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.full,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  banner: {
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    marginBottom: Spacing.lg,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  bannerBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.sm,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  bannerBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  bannerTitle: {
+    color: '#FFFFFF',
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  bannerSubtitle: {
+    color: '#E0E7FF',
+    fontSize: 13,
+    marginBottom: 16,
+  },
+  bannerBtn: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.full,
+  },
+  bannerBtnText: {
+    color: Colors.primary,
+    fontWeight: '700',
+    fontSize: 13,
+    marginRight: 6,
+  },
+  section: {
+    marginBottom: Spacing.lg,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: Colors.light.text,
+  },
+  seeAllText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  categoriesList: {
+    paddingVertical: 4,
+    marginBottom: Spacing.md,
+  },
+  productGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  gridItem: {
+    width: '48%',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.light.text,
+    marginTop: 12,
+  },
+  emptySubtitle: {
+    fontSize: 13,
+    color: Colors.light.textSecondary,
+    marginTop: 4,
   },
 });

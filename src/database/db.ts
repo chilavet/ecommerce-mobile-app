@@ -1,0 +1,181 @@
+import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
+import { Product, Category, User, Order, Address } from '../types';
+
+interface InMemoryStore {
+  users: (User & { password?: string })[];
+  categories: Category[];
+  products: Product[];
+  orders: Order[];
+  addresses: Address[];
+}
+
+const memoryStore: InMemoryStore = {
+  users: [
+    {
+      id: 'usr_demo',
+      email: 'alex@example.com',
+      name: 'Alex Johnson',
+      phone: '+1 (555) 234-5678',
+      password: 'password123',
+      createdAt: new Date().toISOString(),
+    }
+  ],
+  categories: [...SEED_CATEGORIES],
+  products: [...SEED_PRODUCTS],
+  orders: [
+    {
+      id: 'ord_1001',
+      userId: 'usr_demo',
+      items: [
+        {
+          id: 'item_1',
+          orderId: 'ord_1001',
+          productId: 'prod_1',
+          productTitle: 'Sony WH-1000XM5 Wireless Headphones',
+          productImage: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80',
+          quantity: 1,
+          unitPrice: 349.99,
+        }
+      ],
+      subtotal: 349.99,
+      shippingFee: 0,
+      discount: 20,
+      total: 329.99,
+      status: 'delivered',
+      paymentMethod: 'card',
+      shippingAddress: {
+        id: 'addr_1',
+        fullName: 'Alex Johnson',
+        street: '742 Evergreen Terrace',
+        city: 'Springfield',
+        state: 'OR',
+        postalCode: '97477',
+        country: 'United States',
+        phone: '+1 (555) 234-5678',
+        isDefault: true,
+      },
+      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      trackingNumber: 'TRK-98341129-US',
+    }
+  ],
+  addresses: [
+    {
+      id: 'addr_1',
+      userId: 'usr_demo',
+      fullName: 'Alex Johnson',
+      street: '742 Evergreen Terrace',
+      city: 'Springfield',
+      state: 'OR',
+      postalCode: '97477',
+      country: 'United States',
+      phone: '+1 (555) 234-5678',
+      isDefault: true,
+    }
+  ],
+};
+
+export async function initDatabase(): Promise<void> {
+  // Ready immediately in-memory
+  return Promise.resolve();
+}
+
+export async function getProducts(options?: {
+  categoryId?: string;
+  query?: string;
+  featuredOnly?: boolean;
+  sortBy?: 'price-asc' | 'price-desc' | 'rating' | 'popular';
+}): Promise<Product[]> {
+  const { categoryId, query, featuredOnly, sortBy } = options || {};
+  let result = [...memoryStore.products];
+
+  if (categoryId && categoryId !== 'cat_all') {
+    result = result.filter(p => p.categoryId === categoryId);
+  }
+  if (query && query.trim().length > 0) {
+    const q = query.toLowerCase();
+    result = result.filter(
+      p =>
+        p.title.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q)
+    );
+  }
+  if (featuredOnly) {
+    result = result.filter(p => p.isFeatured);
+  }
+
+  if (sortBy === 'price-asc') result.sort((a, b) => a.price - b.price);
+  else if (sortBy === 'price-desc') result.sort((a, b) => b.price - a.price);
+  else if (sortBy === 'rating') result.sort((a, b) => b.rating - a.rating);
+  else if (sortBy === 'popular') result.sort((a, b) => b.reviewsCount - a.reviewsCount);
+  else result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+
+  return result;
+}
+
+export async function getProductById(id: string): Promise<Product | null> {
+  return memoryStore.products.find(p => p.id === id) || null;
+}
+
+export async function getCategories(): Promise<Category[]> {
+  return [...memoryStore.categories];
+}
+
+export async function getUserByEmail(email: string): Promise<(User & { password?: string }) | null> {
+  const normalized = email.trim().toLowerCase();
+  return memoryStore.users.find(u => u.email.toLowerCase() === normalized) || null;
+}
+
+export async function createUser(data: {
+  email: string;
+  name: string;
+  password: string;
+  phone?: string;
+}): Promise<User> {
+  const newUser: User & { password?: string } = {
+    id: `usr_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    email: data.email.trim().toLowerCase(),
+    name: data.name.trim(),
+    phone: data.phone || '',
+    password: data.password,
+    createdAt: new Date().toISOString(),
+  };
+
+  memoryStore.users.push(newUser);
+  return {
+    id: newUser.id,
+    email: newUser.email,
+    name: newUser.name,
+    phone: newUser.phone,
+    createdAt: newUser.createdAt,
+  };
+}
+
+export async function getOrders(userId: string): Promise<Order[]> {
+  return memoryStore.orders
+    .filter(o => o.userId === userId)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+export async function createOrder(order: Order): Promise<Order> {
+  memoryStore.orders.unshift(order);
+  return order;
+}
+
+export async function getAddresses(userId: string): Promise<Address[]> {
+  return memoryStore.addresses.filter(a => a.userId === userId || !a.userId);
+}
+
+export async function saveAddress(address: Address): Promise<Address> {
+  if (address.isDefault) {
+    memoryStore.addresses.forEach(a => (a.isDefault = false));
+  }
+  const idx = memoryStore.addresses.findIndex(a => a.id === address.id);
+  if (idx >= 0) {
+    memoryStore.addresses[idx] = address;
+  } else {
+    memoryStore.addresses.push(address);
+  }
+  return address;
+}
