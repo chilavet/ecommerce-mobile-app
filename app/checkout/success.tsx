@@ -66,7 +66,7 @@ export default function OrderSuccessScreen() {
 
         <TouchableOpacity
           style={styles.continueBtn}
-          onPress={() => router.replace('/(tabs)/')}
+          onPress={() => router.replace('/')}
           activeOpacity={0.8}
         >
           <Text style={styles.continueText}>Continue Shopping</Text>
@@ -181,3 +181,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

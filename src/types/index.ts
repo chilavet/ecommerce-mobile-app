@@ -98,3 +98,4 @@ export interface PromoCode {
   maxDiscount?: number;
   minOrder?: number;
 }
+

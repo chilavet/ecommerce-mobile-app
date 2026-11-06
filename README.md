@@ -94,3 +94,4 @@ ecommerce-mobile-app/
 ├── metro.config.js               # Metro bundler config
 └── app.json                      # Expo application metadata
 ```
+

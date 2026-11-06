@@ -226,3 +226,4 @@ export const PROMO_CODES: PromoCode[] = [
   { code: 'WELCOME10', discountPercentage: 10, minOrder: 50 },
   { code: 'FREESHIP', discountPercentage: 5, minOrder: 0 },
 ];
+

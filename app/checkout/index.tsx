@@ -17,6 +17,8 @@ import { Address, Order } from '@/src/types';
 import { useCart } from '@/src/context/CartContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { getAddresses, saveAddress, createOrder } from '@/src/database/db';
+import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
+import { Switch } from 'react-native';
 
 type PaymentType = 'card' | 'apple_pay' | 'cod';
 
@@ -40,6 +42,24 @@ export default function CheckoutScreen() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentType>('card');
   const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4242');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Biometric Payment Security
+  const [biometrics, setBiometrics] = useState<BiometricStatus>({
+    isAvailable: false,
+    hasHardware: false,
+    isEnrolled: false,
+    biometricType: 'none',
+    biometricName: 'Biometrics',
+  });
+  const [requireBiometrics, setRequireBiometrics] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function initBio() {
+      const status = await checkBiometrics();
+      setBiometrics(status);
+    }
+    initBio();
+  }, []);
 
   useEffect(() => {
     async function loadAddress() {
@@ -93,6 +113,36 @@ export default function CheckoutScreen() {
       return;
     }
 
+    if (requireBiometrics) {
+      const bioAuth = await authenticateWithBiometrics(
+        `Confirm payment of $${total.toFixed(2)} with ${biometrics.biometricName}`
+      );
+
+      if (bioAuth.notEnrolled) {
+        Alert.alert(
+          `${biometrics.biometricName} Setup`,
+          `No biometric credential is set up on this emulator/device yet. Would you like to authorize this payment via simulated ${biometrics.biometricName}?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Authorize & Place Order',
+              onPress: () => processOrderPlacement(selectedAddr),
+            },
+          ]
+        );
+        return;
+      }
+
+      if (!bioAuth.success) {
+        Alert.alert('Biometric Verification', bioAuth.error || 'Authentication failed. Please try again.');
+        return;
+      }
+    }
+
+    await processOrderPlacement(selectedAddr);
+  };
+
+  const processOrderPlacement = async (selectedAddr: Address) => {
     setIsSubmitting(true);
 
     try {
@@ -301,6 +351,31 @@ export default function CheckoutScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Section 2.5: Biometric Authorization */}
+        <View style={[styles.card, Shadows.sm]}>
+          <View style={styles.biometricRow}>
+            <View style={styles.biometricIconWrapper}>
+              <Ionicons
+                name={biometrics.biometricType === 'facial' ? 'scan-outline' : 'finger-print'}
+                size={22}
+                color={Colors.primary}
+              />
+            </View>
+            <View style={{ flex: 1, marginHorizontal: 10 }}>
+              <Text style={styles.biometricTitle}>{biometrics.biometricName} Security</Text>
+              <Text style={styles.biometricSubtitle}>
+                Require biometric verification to approve this transaction
+              </Text>
+            </View>
+            <Switch
+              value={requireBiometrics}
+              onValueChange={setRequireBiometrics}
+              trackColor={{ false: '#CBD5E1', true: Colors.primaryLight }}
+              thumbColor={requireBiometrics ? Colors.primary : '#F8FAFC'}
+            />
+          </View>
+        </View>
+
         {/* Section 3: Order Review Summary */}
         <View style={[styles.card, Shadows.sm]}>
           <Text style={styles.sectionTitle}>Order Breakdown</Text>
@@ -506,6 +581,28 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginLeft: 3,
   },
+  biometricRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  biometricIconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  biometricTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.light.text,
+  },
+  biometricSubtitle: {
+    fontSize: 12,
+    color: Colors.light.textSecondary,
+    marginTop: 2,
+  },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -574,3 +671,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+

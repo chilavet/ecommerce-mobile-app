@@ -80,7 +80,7 @@ export default function OrdersScreen() {
           </Text>
           <TouchableOpacity
             style={styles.startBtn}
-            onPress={() => router.push('/(tabs)/')}
+            onPress={() => router.push('/')}
           >
             <Text style={styles.startBtnText}>Browse Store</Text>
           </TouchableOpacity>
@@ -160,3 +160,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+

@@ -66,7 +66,7 @@ export default function CartScreen() {
         </Text>
         <TouchableOpacity
           style={styles.shopNowBtn}
-          onPress={() => router.push('/(tabs)/')}
+          onPress={() => router.push('/')}
           activeOpacity={0.8}
         >
           <Text style={styles.shopNowText}>Explore Products</Text>
@@ -442,3 +442,4 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
