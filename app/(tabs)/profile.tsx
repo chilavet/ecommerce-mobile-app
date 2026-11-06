@@ -261,12 +261,15 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           style={styles.menuRow}
-          onPress={() => Alert.alert('Notifications', 'Push notifications enabled for order tracking.')}
+          onPress={() => router.push('/notifications-settings')}
         >
           <View style={styles.menuIconWrapper}>
             <Ionicons name="notifications-outline" size={20} color={Colors.primary} />
           </View>
-          <Text style={styles.menuLabel}>Notifications</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.menuLabel}>Notification Preferences</Text>
+            <Text style={styles.menuSubLabel}>Push alerts and email receipt options</Text>
+          </View>
           <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
         </TouchableOpacity>
       </View>

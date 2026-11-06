@@ -16,6 +16,7 @@ import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { Address, Order } from '@/src/types';
 import { useCart } from '@/src/context/CartContext';
 import { useAuth } from '@/src/context/AuthContext';
+import { useNotifications } from '@/src/context/NotificationContext';
 import { getAddresses, saveAddress, createOrder } from '@/src/database/db';
 import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 import { Switch } from 'react-native';
@@ -25,6 +26,7 @@ type PaymentType = 'card' | 'apple_pay' | 'cod';
 export default function CheckoutScreen() {
   const { user, biometricsEnabled, setBiometricsEnabled } = useAuth();
   const { items, subtotal, shippingFee, discount, total, clearCart } = useCart();
+  const { sendOrderConfirmation } = useNotifications();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
@@ -170,6 +172,7 @@ export default function CheckoutScreen() {
       };
 
       await createOrder(newOrder);
+      await sendOrderConfirmation(newOrder.id, newOrder.total, user?.email);
       clearCart();
 
       // Navigate to order confirmation

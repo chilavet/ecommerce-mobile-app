@@ -179,6 +179,24 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Section 1.5: Notification Preferences Shortcut */}
+        <TouchableOpacity
+          style={[styles.card, Shadows.sm]}
+          onPress={() => router.push('/notifications-settings')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.sectionHeader}>
+            <View style={[styles.iconCircle, { backgroundColor: '#E0F2FE' }]}>
+              <Ionicons name="notifications-outline" size={22} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.cardTitle}>Notification Preferences</Text>
+              <Text style={styles.cardSubtitle}>Push alerts, order updates, email receipts</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+          </View>
+        </TouchableOpacity>
+
         {/* Section 2: Change Password */}
         <View style={[styles.card, Shadows.sm]}>
           <View style={styles.sectionHeader}>

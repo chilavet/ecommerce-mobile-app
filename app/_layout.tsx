@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider } from '@/src/context/AuthContext';
 import { CartProvider } from '@/src/context/CartContext';
+import { NotificationProvider } from '@/src/context/NotificationContext';
 import { Colors } from '@/src/constants/theme';
 
 export {
@@ -21,47 +22,56 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <StatusBar style="dark" />
-        <Stack
-          screenOptions={{
-            headerStyle: { backgroundColor: '#FFFFFF' },
-            headerTintColor: Colors.light.text,
-            headerTitleStyle: { fontWeight: '700' },
-            contentStyle: { backgroundColor: Colors.light.background },
-          }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="product/[id]"
-            options={{
-              title: 'Product Details',
-              headerBackTitle: 'Back',
+      <NotificationProvider>
+        <CartProvider>
+          <StatusBar style="dark" />
+          <Stack
+            screenOptions={{
+              headerStyle: { backgroundColor: '#FFFFFF' },
+              headerTintColor: Colors.light.text,
+              headerTitleStyle: { fontWeight: '700' },
+              contentStyle: { backgroundColor: Colors.light.background },
             }}
-          />
-          <Stack.Screen
-            name="checkout/index"
-            options={{
-              title: 'Checkout',
-              headerBackTitle: 'Cart',
-            }}
-          />
-          <Stack.Screen
-            name="checkout/success"
-            options={{
-              headerShown: false,
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen
-            name="settings"
-            options={{
-              title: 'Settings & Security',
-              headerBackTitle: 'Account',
-            }}
-          />
-        </Stack>
-      </CartProvider>
+          >
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="product/[id]"
+              options={{
+                title: 'Product Details',
+                headerBackTitle: 'Back',
+              }}
+            />
+            <Stack.Screen
+              name="checkout/index"
+              options={{
+                title: 'Checkout',
+                headerBackTitle: 'Cart',
+              }}
+            />
+            <Stack.Screen
+              name="checkout/success"
+              options={{
+                headerShown: false,
+                gestureEnabled: false,
+              }}
+            />
+            <Stack.Screen
+              name="settings"
+              options={{
+                title: 'Settings & Security',
+                headerBackTitle: 'Account',
+              }}
+            />
+            <Stack.Screen
+              name="notifications-settings"
+              options={{
+                title: 'Notifications',
+                headerBackTitle: 'Account',
+              }}
+            />
+          </Stack>
+        </CartProvider>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
