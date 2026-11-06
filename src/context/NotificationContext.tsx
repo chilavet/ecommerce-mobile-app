@@ -65,7 +65,7 @@ const initialNotifications: AppNotification[] = [
     timestamp: '15m ago',
     read: false,
     type: 'promotion',
-    route: '/(tabs)/explore',
+    route: '/(tabs)',
   },
   {
     id: 'notif_2',
@@ -74,7 +74,7 @@ const initialNotifications: AppNotification[] = [
     timestamp: '1h ago',
     read: false,
     type: 'promotion',
-    route: '/(tabs)/explore',
+    route: '/(tabs)',
   },
   {
     id: 'notif_3',

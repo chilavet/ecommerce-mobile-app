@@ -1,5 +1,5 @@
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
-import { Product, Category, User, Order, Address } from '../types';
+import { Product, Category, User, Order, Address, OrderStatus } from '../types';
 import { requireOptionalNativeModule } from 'expo-modules-core';
 
 let SQLite: any = null;
@@ -552,6 +552,24 @@ export async function createOrder(order: Order): Promise<Order> {
   }
 
   return order;
+}
+
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<boolean> {
+  if (useFallback || !dbInstance) {
+    const o = memoryStore.orders.find(ord => ord.id === orderId);
+    if (o) o.status = status;
+    return true;
+  }
+
+  try {
+    dbInstance.runSync('UPDATE orders SET status = ? WHERE id = ?', [status, orderId]);
+    const memOrder = memoryStore.orders.find(ord => ord.id === orderId);
+    if (memOrder) memOrder.status = status;
+    return true;
+  } catch (err) {
+    console.error('Failed to update order status:', err);
+    return false;
+  }
 }
 
 export async function getAddresses(userId: string): Promise<Address[]> {

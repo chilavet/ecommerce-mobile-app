@@ -1,5 +1,5 @@
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
-import { Product, Category, User, Order, Address } from '../types';
+import { Product, Category, User, Order, Address, OrderStatus } from '../types';
 
 interface InMemoryStore {
   users: (User & { password?: string })[];
@@ -182,6 +182,12 @@ export async function getOrders(userId: string): Promise<Order[]> {
 export async function createOrder(order: Order): Promise<Order> {
   memoryStore.orders.unshift(order);
   return order;
+}
+
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<boolean> {
+  const o = memoryStore.orders.find(ord => ord.id === orderId);
+  if (o) o.status = status;
+  return true;
 }
 
 export async function getAddresses(userId: string): Promise<Address[]> {

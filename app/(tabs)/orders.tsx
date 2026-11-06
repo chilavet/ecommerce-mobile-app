@@ -11,8 +11,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
 
-import { Colors, Spacing, BorderRadius } from '@/src/constants/theme';
-import { Order } from '@/src/types';
+import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
+import { Order, OrderStatus } from '@/src/types';
 import { getOrders } from '@/src/database/db';
 import { OrderCard } from '@/src/components/OrderCard';
 import { useAuth } from '@/src/context/AuthContext';
@@ -20,6 +20,7 @@ import { useAuth } from '@/src/context/AuthContext';
 export default function OrdersScreen() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [filter, setFilter] = useState<'all' | 'active' | 'delivered'>('all');
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
@@ -47,6 +48,22 @@ export default function OrdersScreen() {
     fetchOrders();
   };
 
+  const handleStatusChange = (orderId: string, newStatus: OrderStatus) => {
+    setOrders(prev =>
+      prev.map(ord => (ord.id === orderId ? { ...ord, status: newStatus } : ord))
+    );
+  };
+
+  const filteredOrders = orders.filter(ord => {
+    if (filter === 'active') {
+      return ord.status === 'placed' || ord.status === 'processing' || ord.status === 'shipped';
+    }
+    if (filter === 'delivered') {
+      return ord.status === 'delivered';
+    }
+    return true;
+  });
+
   if (loading) {
     return (
       <View style={styles.centerContainer}>
@@ -62,31 +79,99 @@ export default function OrdersScreen() {
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
     >
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>Your Purchases</Text>
-        <Text style={styles.subtitle}>
-          Track status, review details, and view past receipts.
-        </Text>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.title}>Order Progress &amp; History</Text>
+            <Text style={styles.subtitle}>
+              Track package progress live from order placed till delivered
+            </Text>
+          </View>
+          <View style={styles.countBadge}>
+            <Text style={styles.countBadgeText}>{orders.length}</Text>
+          </View>
+        </View>
+
+        {/* Filter Tabs */}
+        {orders.length > 0 && (
+          <View style={styles.filterRow}>
+            <TouchableOpacity
+              style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
+              onPress={() => setFilter('all')}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}
+              >
+                All ({orders.length})
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.filterChip, filter === 'active' && styles.filterChipActive]}
+              onPress={() => setFilter('active')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.activePillDot} />
+              <Text
+                style={[styles.filterChipText, filter === 'active' && styles.filterChipTextActive]}
+              >
+                In Progress (
+                {
+                  orders.filter(
+                    o => o.status === 'placed' || o.status === 'processing' || o.status === 'shipped'
+                  ).length
+                }
+                )
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.filterChip, filter === 'delivered' && styles.filterChipActive]}
+              onPress={() => setFilter('delivered')}
+              activeOpacity={0.7}
+            >
+              <Text
+                style={[
+                  styles.filterChipText,
+                  filter === 'delivered' && styles.filterChipTextActive,
+                ]}
+              >
+                Delivered ({orders.filter(o => o.status === 'delivered').length})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
-      {orders.length === 0 ? (
+      {/* Orders List or Empty State */}
+      {filteredOrders.length === 0 ? (
         <View style={styles.emptyContainer}>
           <View style={styles.emptyIconCircle}>
             <Ionicons name="receipt-outline" size={54} color={Colors.primary} />
           </View>
-          <Text style={styles.emptyTitle}>No orders placed yet</Text>
+          <Text style={styles.emptyTitle}>
+            {filter === 'all' ? 'No orders placed yet' : `No ${filter} orders`}
+          </Text>
           <Text style={styles.emptySubtitle}>
-            When you complete a purchase, your order history will appear here.
+            {filter === 'all'
+              ? 'When you place an order, live progress tracking from dispatch to delivery appears here.'
+              : 'Switch filter to "All" to review your complete purchase timeline.'}
           </Text>
           <TouchableOpacity
-            style={styles.startBtn}
-            onPress={() => router.push('/')}
+            style={[styles.startBtn, Shadows.md]}
+            onPress={() => router.push('/(tabs)')}
+            activeOpacity={0.8}
           >
+            <Ionicons name="storefront-outline" size={18} color="#FFFFFF" style={{ marginRight: 6 }} />
             <Text style={styles.startBtnText}>Browse Store</Text>
           </TouchableOpacity>
         </View>
       ) : (
-        orders.map(order => <OrderCard key={order.id} order={order} />)
+        filteredOrders.map(order => (
+          <OrderCard key={order.id} order={order} onStatusChange={handleStatusChange} />
+        ))
       )}
     </ScrollView>
   );
@@ -99,7 +184,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: Spacing.md,
-    paddingBottom: 40,
+    paddingBottom: 110,
   },
   centerContainer: {
     flex: 1,
@@ -108,28 +193,80 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
   },
   header: {
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
     color: Colors.light.text,
-    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: Colors.light.textSecondary,
+    marginTop: 2,
+    maxWidth: 290,
+  },
+  countBadge: {
+    backgroundColor: Colors.primaryLight,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  countBadgeText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: Colors.primary,
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 4,
+  },
+  filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: BorderRadius.full,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  filterChipActive: {
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.light.textSecondary,
+  },
+  filterChipTextActive: {
+    color: '#FFFFFF',
+  },
+  activePillDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+    marginRight: 6,
   },
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
   },
   emptyIconCircle: {
-    width: 100,
-    height: 100,
-    borderRadius: BorderRadius.full,
+    width: 90,
+    height: 90,
+    borderRadius: 45,
     backgroundColor: Colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
@@ -137,7 +274,7 @@ const styles = StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: Colors.light.text,
     marginBottom: 6,
   },
@@ -145,19 +282,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.light.textSecondary,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 19,
     marginBottom: Spacing.lg,
   },
   startBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: Colors.primary,
-    paddingHorizontal: 24,
+    paddingHorizontal: 22,
     paddingVertical: 12,
     borderRadius: BorderRadius.full,
   },
   startBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
     fontSize: 14,
+    fontWeight: '700',
   },
 });
-

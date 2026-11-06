@@ -126,7 +126,7 @@ export default function ShopHomeScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           onClear={() => setSearchQuery('')}
-          onFilterPress={() => router.push('/(tabs)/explore')}
+          onFilterPress={() => setSelectedCategoryId('cat_all')}
         />
 
         {/* Hero Promo Banner */}
@@ -138,7 +138,7 @@ export default function ShopHomeScreen() {
           <Text style={styles.bannerSubtitle}>Use promo code SAVE20 at checkout</Text>
           <TouchableOpacity
             style={styles.bannerBtn}
-            onPress={() => router.push('/(tabs)/explore')}
+            onPress={() => setSelectedCategoryId('cat_all')}
           >
             <Text style={styles.bannerBtnText}>Shop Now</Text>
             <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
@@ -171,7 +171,7 @@ export default function ShopHomeScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Featured Deals 🔥</Text>
-                <TouchableOpacity onPress={() => router.push('/(tabs)/explore')}>
+                <TouchableOpacity onPress={() => setSelectedCategoryId('cat_all')}>
                   <Text style={styles.seeAllText}>See All</Text>
                 </TouchableOpacity>
               </View>

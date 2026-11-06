@@ -186,7 +186,7 @@ export default function NotificationsScreen() {
             </Text>
             <TouchableOpacity
               style={styles.exploreBtn}
-              onPress={() => router.push('/(tabs)/explore')}
+              onPress={() => router.push('/(tabs)')}
             >
               <Text style={styles.exploreBtnText}>Browse Store</Text>
             </TouchableOpacity>
