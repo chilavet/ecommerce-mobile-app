@@ -18,7 +18,7 @@ import { useAuth } from '@/src/context/AuthContext';
 import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 
 export default function ProfileScreen() {
-  const { user, login, register, logout } = useAuth();
+  const { user, login, register, logout, biometricsEnabled, setBiometricsEnabled } = useAuth();
 
   // Biometrics State
   const [biometrics, setBiometrics] = useState<BiometricStatus>({
@@ -28,7 +28,6 @@ export default function ProfileScreen() {
     biometricType: 'none',
     biometricName: 'Biometrics',
   });
-  const [biometricLoginEnabled, setBiometricLoginEnabled] = useState(true);
 
   // Auth Modal State
   const [authModalVisible, setAuthModalVisible] = useState(false);
@@ -191,6 +190,20 @@ export default function ProfileScreen() {
       <View style={[styles.menuSection, Shadows.sm]}>
         <Text style={styles.menuHeader}>Account & Preferences</Text>
 
+        <TouchableOpacity
+          style={styles.menuRow}
+          onPress={() => router.push('/settings')}
+        >
+          <View style={[styles.menuIconWrapper, { backgroundColor: '#EFF6FF' }]}>
+            <Ionicons name="settings-outline" size={20} color={Colors.primary} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.menuLabel}>Security & Settings</Text>
+            <Text style={styles.menuSubLabel}>Password, fingerprint, delete account</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+        </TouchableOpacity>
+
         <View style={styles.menuRow}>
           <View style={styles.menuIconWrapper}>
             <Ionicons
@@ -206,10 +219,10 @@ export default function ProfileScreen() {
             </Text>
           </View>
           <Switch
-            value={biometricLoginEnabled}
-            onValueChange={setBiometricLoginEnabled}
+            value={biometricsEnabled}
+            onValueChange={setBiometricsEnabled}
             trackColor={{ false: '#CBD5E1', true: Colors.primaryLight }}
-            thumbColor={biometricLoginEnabled ? Colors.primary : '#F8FAFC'}
+            thumbColor={biometricsEnabled ? Colors.primary : '#F8FAFC'}
           />
         </View>
 

@@ -471,6 +471,52 @@ export async function createUser(data: {
   };
 }
 
+export async function updateUserPassword(
+  userId: string,
+  oldPass: string,
+  newPass: string
+): Promise<{ success: boolean; error?: string }> {
+  if (useFallback || !dbInstance) {
+    const user = memoryStore.users.find(u => u.id === userId);
+    if (!user) return { success: false, error: 'User account not found.' };
+    if (user.password && user.password !== oldPass) {
+      return { success: false, error: 'Current password does not match.' };
+    }
+    user.password = newPass;
+    return { success: true };
+  }
+
+  try {
+    const row = dbInstance.getFirstSync('SELECT password FROM users WHERE id = ?', [userId]);
+    if (!row) return { success: false, error: 'User account not found.' };
+    if (row.password !== oldPass) {
+      return { success: false, error: 'Current password does not match.' };
+    }
+    dbInstance.runSync('UPDATE users SET password = ? WHERE id = ?', [newPass, userId]);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Could not update password.' };
+  }
+}
+
+export async function deleteUser(userId: string): Promise<{ success: boolean; error?: string }> {
+  if (useFallback || !dbInstance) {
+    memoryStore.users = memoryStore.users.filter(u => u.id !== userId);
+    memoryStore.addresses = memoryStore.addresses.filter(a => a.userId !== userId);
+    memoryStore.orders = memoryStore.orders.filter(o => o.userId !== userId);
+    return { success: true };
+  }
+
+  try {
+    dbInstance.runSync('DELETE FROM addresses WHERE user_id = ?', [userId]);
+    dbInstance.runSync('DELETE FROM orders WHERE user_id = ?', [userId]);
+    dbInstance.runSync('DELETE FROM users WHERE id = ?', [userId]);
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Could not delete user account.' };
+  }
+}
+
 export async function getOrders(userId: string): Promise<Order[]> {
   if (useFallback || !dbInstance) {
     return memoryStore.orders

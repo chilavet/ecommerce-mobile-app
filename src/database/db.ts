@@ -152,6 +152,27 @@ export async function createUser(data: {
   };
 }
 
+export async function updateUserPassword(
+  userId: string,
+  oldPass: string,
+  newPass: string
+): Promise<{ success: boolean; error?: string }> {
+  const user = memoryStore.users.find(u => u.id === userId);
+  if (!user) return { success: false, error: 'User account not found.' };
+  if (user.password && user.password !== oldPass) {
+    return { success: false, error: 'Current password does not match.' };
+  }
+  user.password = newPass;
+  return { success: true };
+}
+
+export async function deleteUser(userId: string): Promise<{ success: boolean; error?: string }> {
+  memoryStore.users = memoryStore.users.filter(u => u.id !== userId);
+  memoryStore.addresses = memoryStore.addresses.filter(a => a.userId !== userId);
+  memoryStore.orders = memoryStore.orders.filter(o => o.userId !== userId);
+  return { success: true };
+}
+
 export async function getOrders(userId: string): Promise<Order[]> {
   return memoryStore.orders
     .filter(o => o.userId === userId)

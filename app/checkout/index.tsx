@@ -23,7 +23,7 @@ import { Switch } from 'react-native';
 type PaymentType = 'card' | 'apple_pay' | 'cod';
 
 export default function CheckoutScreen() {
-  const { user } = useAuth();
+  const { user, biometricsEnabled, setBiometricsEnabled } = useAuth();
   const { items, subtotal, shippingFee, discount, total, clearCart } = useCart();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -51,7 +51,6 @@ export default function CheckoutScreen() {
     biometricType: 'none',
     biometricName: 'Biometrics',
   });
-  const [requireBiometrics, setRequireBiometrics] = useState<boolean>(true);
 
   useEffect(() => {
     async function initBio() {
@@ -113,7 +112,7 @@ export default function CheckoutScreen() {
       return;
     }
 
-    if (requireBiometrics) {
+    if (biometricsEnabled) {
       const bioAuth = await authenticateWithBiometrics(
         `Confirm payment of $${total.toFixed(2)} with ${biometrics.biometricName}`
       );
@@ -368,10 +367,10 @@ export default function CheckoutScreen() {
               </Text>
             </View>
             <Switch
-              value={requireBiometrics}
-              onValueChange={setRequireBiometrics}
+              value={biometricsEnabled}
+              onValueChange={setBiometricsEnabled}
               trackColor={{ false: '#CBD5E1', true: Colors.primaryLight }}
-              thumbColor={requireBiometrics ? Colors.primary : '#F8FAFC'}
+              thumbColor={biometricsEnabled ? Colors.primary : '#F8FAFC'}
             />
           </View>
         </View>

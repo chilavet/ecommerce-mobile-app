@@ -1,12 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { getUserByEmail, createUser, initDatabase } from '../database/db';
+import {
+  getUserByEmail,
+  createUser,
+  initDatabase,
+  updateUserPassword,
+  deleteUser,
+} from '../database/db';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  biometricsEnabled: boolean;
+  setBiometricsEnabled: (enabled: boolean) => void;
   login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, pass: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
+  changePassword: (oldPass: string, newPass: string) => Promise<{ success: boolean; error?: string }>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -15,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [biometricsEnabled, setBiometricsEnabled] = useState<boolean>(true);
 
   useEffect(() => {
     async function setup() {
@@ -82,12 +93,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const changePassword = async (oldPass: string, newPass: string) => {
+    if (!user) {
+      return { success: false, error: 'You must be signed in to change your password.' };
+    }
+    const res = await updateUserPassword(user.id, oldPass, newPass);
+    return res;
+  };
+
+  const deleteAccount = async () => {
+    if (!user) {
+      return { success: false, error: 'No active user session to delete.' };
+    }
+    const res = await deleteUser(user.id);
+    if (res.success) {
+      setUser(null);
+    }
+    return res;
+  };
+
   const logout = () => {
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        biometricsEnabled,
+        setBiometricsEnabled,
+        login,
+        register,
+        changePassword,
+        deleteAccount,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -100,4 +142,3 @@ export function useAuth() {
   }
   return context;
 }
-

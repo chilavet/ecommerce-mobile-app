@@ -53,6 +53,13 @@ export default function RootLayout() {
               gestureEnabled: false,
             }}
           />
+          <Stack.Screen
+            name="settings"
+            options={{
+              title: 'Settings & Security',
+              headerBackTitle: 'Account',
+            }}
+          />
         </Stack>
       </CartProvider>
     </AuthProvider>
