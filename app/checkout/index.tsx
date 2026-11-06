@@ -13,15 +13,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
-import { Address, Order } from '@/src/types';
+import { Address, Order, PaymentMethod } from '@/src/types';
 import { useCart } from '@/src/context/CartContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { useNotifications } from '@/src/context/NotificationContext';
+import { useWallet } from '@/src/context/WalletContext';
+import { PaystackModal, PaystackSuccessResponse } from '@/src/components/PaystackModal';
 import { getAddresses, saveAddress, createOrder } from '@/src/database/db';
 import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 import { Switch } from 'react-native';
 
-type PaymentType = 'card' | 'apple_pay' | 'cod';
+type PaymentType = 'wallet' | 'paystack' | 'card' | 'apple_pay' | 'cod';
 
 export default function CheckoutScreen() {
   const { user, biometricsEnabled, setBiometricsEnabled } = useAuth();
@@ -41,9 +43,14 @@ export default function CheckoutScreen() {
   const [phone, setPhone] = useState(user?.phone || '');
 
   // Payment method
-  const [paymentMethod, setPaymentMethod] = useState<PaymentType>('card');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentType>('wallet');
   const [cardNumber, setCardNumber] = useState('•••• •••• •••• 4242');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  // Digital Wallet & Paystack Gateway
+  const { balance, payWithWallet, hasSufficientBalance } = useWallet();
+  const [paystackVisible, setPaystackVisible] = useState(false);
+  const [pendingAddress, setPendingAddress] = useState<Address | null>(null);
 
   // Biometric Payment Security
   const [biometrics, setBiometrics] = useState<BiometricStatus>({
@@ -114,6 +121,35 @@ export default function CheckoutScreen() {
       return;
     }
 
+    // 1. If Paystack selected: Launch Paystack gateway modal
+    if (paymentMethod === 'paystack') {
+      setPendingAddress(selectedAddr);
+      setPaystackVisible(true);
+      return;
+    }
+
+    // 2. If Wallet selected: Check sufficient balance
+    if (paymentMethod === 'wallet') {
+      if (!hasSufficientBalance(total)) {
+        Alert.alert(
+          'Insufficient Wallet Balance',
+          `Your wallet balance ($${balance.toFixed(2)}) is insufficient for this order ($${total.toFixed(2)}).\n\nWould you like to pay with your card via Paystack?`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Pay with Paystack',
+              onPress: () => {
+                setPaymentMethod('paystack');
+                setPendingAddress(selectedAddr);
+                setPaystackVisible(true);
+              },
+            },
+          ]
+        );
+        return;
+      }
+    }
+
     if (biometricsEnabled) {
       const bioAuth = await authenticateWithBiometrics(
         `Confirm payment of $${total.toFixed(2)} with ${biometrics.biometricName}`
@@ -143,11 +179,22 @@ export default function CheckoutScreen() {
     await processOrderPlacement(selectedAddr);
   };
 
-  const processOrderPlacement = async (selectedAddr: Address) => {
+  const processOrderPlacement = async (selectedAddr: Address, paystackRef?: string) => {
     setIsSubmitting(true);
 
     try {
       const orderId = `ord_${Date.now().toString().slice(-6)}`;
+
+      // If paying via wallet: deduct balance
+      if (paymentMethod === 'wallet') {
+        const walletRes = await payWithWallet(total, orderId);
+        if (!walletRes.success) {
+          Alert.alert('Wallet Payment Failed', walletRes.error || 'Could not deduct from wallet balance.');
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const newOrder: Order = {
         id: orderId,
         userId: user ? user.id : 'usr_demo',
@@ -156,7 +203,8 @@ export default function CheckoutScreen() {
         discount,
         total,
         status: 'placed',
-        paymentMethod,
+        paymentMethod: paymentMethod as PaymentMethod,
+        paymentReference: paystackRef || (paymentMethod === 'wallet' ? `WLT_${orderId}` : undefined),
         shippingAddress: selectedAddr,
         createdAt: new Date().toISOString(),
         trackingNumber: `TRK-${Math.floor(10000000 + Math.random() * 90000000)}-US`,
@@ -189,6 +237,13 @@ export default function CheckoutScreen() {
       Alert.alert('Order Failed', 'Could not complete the purchase. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePaystackSuccess = async (res: PaystackSuccessResponse) => {
+    setPaystackVisible(false);
+    if (pendingAddress) {
+      await processOrderPlacement(pendingAddress, res.reference);
     }
   };
 
@@ -291,6 +346,76 @@ export default function CheckoutScreen() {
             </View>
           </View>
 
+          {/* Option 1: ShopPulse Digital Wallet */}
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              paymentMethod === 'wallet' && styles.paymentOptionSelected,
+            ]}
+            onPress={() => setPaymentMethod('wallet')}
+          >
+            <Ionicons
+              name={paymentMethod === 'wallet' ? 'radio-button-on' : 'radio-button-off'}
+              size={20}
+              color={paymentMethod === 'wallet' ? Colors.primary : Colors.light.textMuted}
+            />
+            <View style={[styles.methodIconBox, { backgroundColor: '#ECFDF5' }]}>
+              <Ionicons name="wallet" size={18} color="#10B981" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={styles.methodTitle}>Digital Wallet</Text>
+                <View style={hasSufficientBalance(total) ? styles.sufficientBadge : styles.insufficientBadge}>
+                  <Text style={hasSufficientBalance(total) ? styles.sufficientBadgeText : styles.insufficientBadgeText}>
+                    {hasSufficientBalance(total) ? 'Ready' : 'Low Balance'}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.methodSubtitle}>
+                Balance: ${balance.toFixed(2)} • {hasSufficientBalance(total) ? '1-tap instant pay' : `$${(total - balance).toFixed(2)} needed`}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push('/wallet')}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              style={styles.topUpLink}
+            >
+              <Text style={styles.topUpLinkText}>Fund</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+
+          {/* Option 2: Paystack Gateway (Card, Transfer, USSD) */}
+          <TouchableOpacity
+            style={[
+              styles.paymentOption,
+              paymentMethod === 'paystack' && styles.paymentOptionSelected,
+            ]}
+            onPress={() => setPaymentMethod('paystack')}
+          >
+            <Ionicons
+              name={paymentMethod === 'paystack' ? 'radio-button-on' : 'radio-button-off'}
+              size={20}
+              color={paymentMethod === 'paystack' ? Colors.primary : Colors.light.textMuted}
+            />
+            <View style={[styles.methodIconBox, { backgroundColor: '#E0F2FE' }]}>
+              <Ionicons name="flash" size={18} color="#0BA4DB" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 8 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={styles.methodTitle}>Pay with Paystack</Text>
+                <View style={styles.paystackPill}>
+                  <Text style={styles.paystackPillText}>GATEWAY</Text>
+                </View>
+              </View>
+              <Text style={styles.methodSubtitle}>Visa, Mastercard, Verve, Transfer, USSD</Text>
+            </View>
+            <View style={styles.secureBadge}>
+              <Ionicons name="shield-checkmark" size={13} color="#0BA4DB" />
+              <Text style={[styles.secureText, { color: '#0BA4DB' }]}>Paystack</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* Option 3: Saved Credit or Debit Card */}
           <TouchableOpacity
             style={[
               styles.paymentOption,
@@ -303,8 +428,10 @@ export default function CheckoutScreen() {
               size={20}
               color={paymentMethod === 'card' ? Colors.primary : Colors.light.textMuted}
             />
-            <Ionicons name="card-outline" size={22} color={Colors.light.text} style={styles.methodIcon} />
-            <View style={{ flex: 1 }}>
+            <View style={[styles.methodIconBox, { backgroundColor: '#EFF6FF' }]}>
+              <Ionicons name="card-outline" size={18} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 8 }}>
               <Text style={styles.methodTitle}>Credit or Debit Card</Text>
               <Text style={styles.methodSubtitle}>Visa ending in 4242</Text>
             </View>
@@ -314,6 +441,7 @@ export default function CheckoutScreen() {
             </View>
           </TouchableOpacity>
 
+          {/* Option 4: Apple Pay / Google Pay */}
           <TouchableOpacity
             style={[
               styles.paymentOption,
@@ -326,13 +454,16 @@ export default function CheckoutScreen() {
               size={20}
               color={paymentMethod === 'apple_pay' ? Colors.primary : Colors.light.textMuted}
             />
-            <Ionicons name="logo-apple" size={22} color={Colors.light.text} style={styles.methodIcon} />
-            <View style={{ flex: 1 }}>
+            <View style={[styles.methodIconBox, { backgroundColor: '#F1F5F9' }]}>
+              <Ionicons name="logo-google" size={18} color="#4285F4" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 8 }}>
               <Text style={styles.methodTitle}>Apple Pay / Google Pay</Text>
               <Text style={styles.methodSubtitle}>Fast one-touch checkout</Text>
             </View>
           </TouchableOpacity>
 
+          {/* Option 5: Cash on Delivery */}
           <TouchableOpacity
             style={[
               styles.paymentOption,
@@ -345,8 +476,10 @@ export default function CheckoutScreen() {
               size={20}
               color={paymentMethod === 'cod' ? Colors.primary : Colors.light.textMuted}
             />
-            <Ionicons name="cash-outline" size={22} color={Colors.light.text} style={styles.methodIcon} />
-            <View style={{ flex: 1 }}>
+            <View style={[styles.methodIconBox, { backgroundColor: '#FEF3C7' }]}>
+              <Ionicons name="cash-outline" size={18} color="#D97706" />
+            </View>
+            <View style={{ flex: 1, marginLeft: 8 }}>
               <Text style={styles.methodTitle}>Cash on Delivery</Text>
               <Text style={styles.methodSubtitle}>Pay upon receiving package</Text>
             </View>
@@ -420,7 +553,12 @@ export default function CheckoutScreen() {
         </View>
 
         <TouchableOpacity
-          style={[styles.placeOrderBtn, isSubmitting && { opacity: 0.7 }]}
+          style={[
+            styles.placeOrderBtn,
+            paymentMethod === 'paystack' && { backgroundColor: '#0BA4DB' },
+            paymentMethod === 'wallet' && { backgroundColor: '#10B981' },
+            isSubmitting && { opacity: 0.7 },
+          ]}
           onPress={handlePlaceOrder}
           disabled={isSubmitting}
           activeOpacity={0.8}
@@ -429,12 +567,34 @@ export default function CheckoutScreen() {
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <>
-              <Text style={styles.placeOrderBtnText}>Place Order</Text>
-              <Ionicons name="lock-closed" size={16} color="#FFFFFF" style={{ marginLeft: 6 }} />
+              <Text style={styles.placeOrderBtnText}>
+                {paymentMethod === 'wallet'
+                  ? `Pay $${total.toFixed(2)} with Wallet`
+                  : paymentMethod === 'paystack'
+                  ? `Pay $${total.toFixed(2)} via Paystack`
+                  : `Place Order ($${total.toFixed(2)})`}
+              </Text>
+              <Ionicons
+                name={paymentMethod === 'paystack' ? 'flash' : 'lock-closed'}
+                size={16}
+                color="#FFFFFF"
+                style={{ marginLeft: 6 }}
+              />
             </>
           )}
         </TouchableOpacity>
       </View>
+
+      {/* Paystack Gateway Checkout Modal */}
+      <PaystackModal
+        visible={paystackVisible}
+        amount={total}
+        currency="$"
+        email={user?.email || 'alex@example.com'}
+        purpose="ShopPulse Order Checkout"
+        onSuccess={handlePaystackSuccess}
+        onClose={() => setPaystackVisible(false)}
+      />
     </View>
   );
 }
@@ -556,6 +716,59 @@ const styles = StyleSheet.create({
   paymentOptionSelected: {
     borderColor: Colors.primary,
     backgroundColor: '#EFF6FF',
+  },
+  methodIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+  },
+  sufficientBadge: {
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+  },
+  sufficientBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#059669',
+  },
+  insufficientBadge: {
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.sm,
+  },
+  insufficientBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: Colors.danger,
+  },
+  topUpLink: {
+    backgroundColor: '#0BA4DB',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: BorderRadius.full,
+  },
+  topUpLinkText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  paystackPill: {
+    backgroundColor: '#0BA4DB',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 3,
+  },
+  paystackPillText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   methodIcon: {
     marginHorizontal: 10,

@@ -16,6 +16,7 @@ import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
 import { useLocation } from '@/src/context/LocationContext';
 import { useNotifications } from '@/src/context/NotificationContext';
+import { useWallet } from '@/src/context/WalletContext';
 import { getOrders } from '@/src/database/db';
 import { LocationPickerModal } from '@/src/components/LocationPickerModal';
 import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
@@ -24,6 +25,7 @@ export default function ProfileScreen() {
   const { user, login, register, logout } = useAuth();
   const { currentLocation } = useLocation();
   const { unreadCount } = useNotifications();
+  const { balance, currency } = useWallet();
 
   // Orders count state
   const [ordersCount, setOrdersCount] = useState<number>(0);
@@ -198,30 +200,6 @@ export default function ProfileScreen() {
         )}
       </View>
 
-      {/* Guest Banner if not signed in */}
-      {!user && (
-        <View style={[styles.guestBanner, Shadows.sm]}>
-          <View style={styles.guestBannerIcon}>
-            <Ionicons name="sparkles" size={20} color={Colors.accent} />
-          </View>
-          <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.guestBannerTitle}>Create an Account</Text>
-            <Text style={styles.guestBannerSubtitle}>
-              Unlock personalized deals, 1-tap checkout, and order tracking.
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.guestBannerBtn}
-            onPress={() => {
-              setAuthMode('register');
-              setAuthModalVisible(true);
-            }}
-          >
-            <Text style={styles.guestBannerBtnText}>Register</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
       {/* 2. Quick Overview Stats Bar */}
       <View style={styles.statsRow}>
         <TouchableOpacity
@@ -269,6 +247,33 @@ export default function ProfileScreen() {
       <View style={[styles.menuSection, Shadows.sm]}>
         <Text style={styles.sectionTitle}>Delivery &amp; Payment</Text>
 
+        {/* Digital Wallet */}
+        <TouchableOpacity
+          style={styles.menuRow}
+          onPress={() => router.push('/wallet')}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.menuIconWrapper, { backgroundColor: '#ECFDF5' }]}>
+            <Ionicons name="wallet-outline" size={20} color="#10B981" />
+          </View>
+          <View style={{ flex: 1, marginRight: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={styles.menuLabel}>ShopPulse Wallet</Text>
+              <View style={styles.walletPill}>
+                <Ionicons name="flash" size={10} color="#0BA4DB" />
+                <Text style={styles.walletPillText}>Paystack</Text>
+              </View>
+            </View>
+            <Text style={styles.menuSubLabel}>
+              Balance: {currency}{balance.toFixed(2)} • 1-tap checkout
+            </Text>
+          </View>
+          <View style={[styles.changeBadge, { backgroundColor: '#ECFDF5' }]}>
+            <Text style={[styles.changeBadgeText, { color: '#059669' }]}>Fund</Text>
+            <Ionicons name="chevron-forward" size={14} color="#059669" />
+          </View>
+        </TouchableOpacity>
+
         {/* Primary Delivery Address */}
         <TouchableOpacity
           style={styles.menuRow}
@@ -301,7 +306,7 @@ export default function ProfileScreen() {
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
             <Text style={styles.menuLabel}>Payment Options</Text>
-            <Text style={styles.menuSubLabel}>Visa •••• 4242 (Default), Google Pay</Text>
+            <Text style={styles.menuSubLabel}>Paystack, Wallet, Visa •••• 4242</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
         </TouchableOpacity>
@@ -435,6 +440,49 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
 
+            {/* 1. ShopPulse Digital Wallet */}
+            <TouchableOpacity
+              style={styles.paymentCard}
+              onPress={() => {
+                setPaymentModalVisible(false);
+                router.push('/wallet');
+              }}
+              activeOpacity={0.8}
+            >
+              <View style={[styles.paymentIconBox, { backgroundColor: '#ECFDF5' }]}>
+                <Ionicons name="wallet" size={22} color="#10B981" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={styles.paymentCardTitle}>ShopPulse Wallet</Text>
+                  <View style={styles.walletPill}>
+                    <Text style={styles.walletPillText}>Paystack</Text>
+                  </View>
+                </View>
+                <Text style={styles.paymentCardSubtitle}>
+                  Balance: {currency}{balance.toFixed(2)} • 1-tap pay
+                </Text>
+              </View>
+              <View style={[styles.defaultBadge, { backgroundColor: '#EFF6FF' }]}>
+                <Text style={[styles.defaultBadgeText, { color: Colors.primary }]}>OPEN</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* 2. Paystack Card & Transfer Gateway */}
+            <View style={styles.paymentCard}>
+              <View style={[styles.paymentIconBox, { backgroundColor: '#E0F2FE' }]}>
+                <Ionicons name="flash" size={20} color="#0BA4DB" />
+              </View>
+              <View style={{ flex: 1, marginLeft: 12 }}>
+                <Text style={styles.paymentCardTitle}>Paystack Gateway</Text>
+                <Text style={styles.paymentCardSubtitle}>Cards, Bank Transfer, USSD</Text>
+              </View>
+              <View style={styles.defaultBadge}>
+                <Text style={styles.defaultBadgeText}>ACTIVE</Text>
+              </View>
+            </View>
+
+            {/* 3. Saved Visa */}
             <View style={styles.paymentCard}>
               <View style={styles.paymentIconBox}>
                 <Ionicons name="card" size={24} color={Colors.primary} />
@@ -794,6 +842,20 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.light.textSecondary,
     marginTop: 2,
+  },
+  walletPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E0F2FE',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    gap: 3,
+  },
+  walletPillText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#0BA4DB',
   },
   changeBadge: {
     flexDirection: 'row',

@@ -101,6 +101,8 @@ export interface OrderItem {
   unitPrice: number;
 }
 
+export type PaymentMethod = 'card' | 'apple_pay' | 'google_pay' | 'cod' | 'wallet' | 'paystack';
+
 export interface Order {
   id: string;
   userId: string;
@@ -110,10 +112,33 @@ export interface Order {
   discount: number;
   total: number;
   status: OrderStatus;
-  paymentMethod: 'card' | 'apple_pay' | 'google_pay' | 'cod';
+  paymentMethod: PaymentMethod;
+  paymentReference?: string;
   shippingAddress: Address;
   createdAt: string;
   trackingNumber?: string;
+}
+
+export type WalletTransactionType = 'credit' | 'debit';
+export type WalletTransactionChannel = 'paystack' | 'checkout' | 'refund' | 'bonus' | 'transfer';
+
+export interface WalletTransaction {
+  id: string;
+  userId: string;
+  type: WalletTransactionType; // 'credit' | 'debit'
+  amount: number;
+  description: string;
+  channel: WalletTransactionChannel;
+  reference: string;
+  createdAt: string;
+  status: 'successful' | 'pending' | 'failed';
+}
+
+export interface Wallet {
+  userId: string;
+  balance: number;
+  currency: string;
+  transactions: WalletTransaction[];
 }
 
 export interface PromoCode {
