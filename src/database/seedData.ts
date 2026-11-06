@@ -36,6 +36,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Weight': '250g',
       'Noise Cancellation': 'Active Dual Processor',
     },
+    location: {
+      name: 'Sony Authorized Experience Store',
+      address: '600 Charleston Rd',
+      city: 'Mountain View',
+      state: 'CA',
+      postalCode: '94043',
+      latitude: 37.4205,
+      longitude: -122.0950,
+      phone: '+1 (650) 555-0191',
+    },
   },
   {
     id: 'prod_2',
@@ -62,6 +72,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Chipset': 'Apple S9 SiP',
       'Water Resistance': '50 meters (Swimproof)',
       'Battery': '18 hours normal / 36 hours low power',
+    },
+    location: {
+      name: 'Apple Stanford Shopping Center',
+      address: '379 Stanford Shopping Center',
+      city: 'Palo Alto',
+      state: 'CA',
+      postalCode: '94304',
+      latitude: 37.4435,
+      longitude: -122.1712,
+      phone: '+1 (650) 555-0122',
     },
   },
   {
@@ -90,6 +110,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Laptop Compartment': 'Up to 15.6 inch',
       'Hardware': 'Antique Solid Brass',
     },
+    location: {
+      name: 'Veloce Leather Boutique Santana Row',
+      address: '377 Santana Row',
+      city: 'San Jose',
+      state: 'CA',
+      postalCode: '95128',
+      latitude: 37.3218,
+      longitude: -121.9478,
+      phone: '+1 (408) 555-0144',
+    },
   },
   {
     id: 'prod_4',
@@ -115,6 +145,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Carafe Capacity': '800 ml (4 cups)',
       'Material': 'High-density Ceramic & Borosilicate glass',
       'Filter': 'Laser-cut Stainless Steel (No paper needed)',
+    },
+    location: {
+      name: 'Kaffé Roastery & Store Castro',
+      address: '256 Castro St',
+      city: 'Mountain View',
+      state: 'CA',
+      postalCode: '94041',
+      latitude: 37.3912,
+      longitude: -122.0805,
+      phone: '+1 (650) 555-0177',
     },
   },
   {
@@ -143,6 +183,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Battery': '4000mAh (Up to 200h without backlight)',
       'Layout': '75% Compact',
     },
+    location: {
+      name: 'TechGear Electronics Hub',
+      address: '1020 W El Camino Real',
+      city: 'Sunnyvale',
+      state: 'CA',
+      postalCode: '94087',
+      latitude: 37.3718,
+      longitude: -122.0450,
+      phone: '+1 (408) 555-0163',
+    },
   },
   {
     id: 'prod_6',
@@ -167,6 +217,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Color Temperature': '2700K - 6500K Dimmable',
       'Wireless Charger': '15W Fast Charge Qi Base',
       'Material': 'Solid American Oak & Matte Powder-Coated Steel',
+    },
+    location: {
+      name: 'Nordlys Design Studio SF SOMA',
+      address: '855 Folsom St',
+      city: 'San Francisco',
+      state: 'CA',
+      postalCode: '94107',
+      latitude: 37.7815,
+      longitude: -122.4010,
+      phone: '+1 (415) 555-0188',
     },
   },
   {
@@ -193,6 +253,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Frame Material': 'Aerospace-Grade Beta Titanium',
       'Weight': '18.5 grams',
     },
+    location: {
+      name: 'Solstice Optics Palo Alto',
+      address: '532 University Ave',
+      city: 'Palo Alto',
+      state: 'CA',
+      postalCode: '94301',
+      latitude: 37.4475,
+      longitude: -122.1585,
+      phone: '+1 (650) 555-0139',
+    },
   },
   {
     id: 'prod_8',
@@ -218,6 +288,16 @@ export const SEED_PRODUCTS: Product[] = [
       'Battery': 'Up to 12 hours playback',
       'Weight': '600g',
     },
+    location: {
+      name: 'Bose Experience Center Cupertino',
+      address: '10123 N Wolfe Rd',
+      city: 'Cupertino',
+      state: 'CA',
+      postalCode: '95014',
+      latitude: 37.3325,
+      longitude: -122.0150,
+      phone: '+1 (408) 555-0155',
+    },
   },
 ];
 
@@ -226,4 +306,3 @@ export const PROMO_CODES: PromoCode[] = [
   { code: 'WELCOME10', discountPercentage: 10, minOrder: 50 },
   { code: 'FREESHIP', discountPercentage: 5, minOrder: 0 },
 ];
-

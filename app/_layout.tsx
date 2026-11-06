@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from '@/src/context/AuthContext';
 import { CartProvider } from '@/src/context/CartContext';
 import { NotificationProvider } from '@/src/context/NotificationContext';
+import { LocationProvider } from '@/src/context/LocationContext';
 import { Colors } from '@/src/constants/theme';
 
 export {
@@ -22,10 +23,11 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <NotificationProvider>
-        <CartProvider>
-          <StatusBar style="dark" />
-          <Stack
+      <LocationProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <StatusBar style="dark" />
+            <Stack
             screenOptions={{
               headerStyle: { backgroundColor: '#FFFFFF' },
               headerTintColor: Colors.light.text,
@@ -79,6 +81,7 @@ export default function RootLayout() {
           </Stack>
         </CartProvider>
       </NotificationProvider>
-    </AuthProvider>
+    </LocationProvider>
+  </AuthProvider>
   );
 }

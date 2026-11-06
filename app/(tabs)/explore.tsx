@@ -14,15 +14,20 @@ import { Product, Category } from '@/src/types';
 import { getProducts, getCategories } from '@/src/database/db';
 import { ProductCard } from '@/src/components/ProductCard';
 import { SearchBar } from '@/src/components/SearchBar';
+import { LocationPickerModal } from '@/src/components/LocationPickerModal';
+import { useLocation } from '@/src/context/LocationContext';
 
-type SortOption = 'popular' | 'rating' | 'price-asc' | 'price-desc';
+type SortOption = 'distance' | 'popular' | 'rating' | 'price-asc' | 'price-desc';
 
 export default function ExploreScreen() {
+  const { currentLocation, enrichAndSortProducts } = useLocation();
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('cat_all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [sortBy, setSortBy] = useState<SortOption>('popular');
+  const [sortBy, setSortBy] = useState<SortOption>('distance');
+  const [locationModalVisible, setLocationModalVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -33,11 +38,11 @@ export default function ExploreScreen() {
           getProducts({
             categoryId: selectedCategoryId,
             query: searchQuery,
-            sortBy,
+            sortBy: sortBy === 'distance' ? undefined : sortBy,
           }),
         ]);
         setCategories(cats);
-        setProducts(prods);
+        setProducts(enrichAndSortProducts(prods, sortBy === 'distance'));
       } catch (err) {
         console.error('Error in explore search:', err);
       } finally {
@@ -45,9 +50,10 @@ export default function ExploreScreen() {
       }
     }
     load();
-  }, [selectedCategoryId, searchQuery, sortBy]);
+  }, [selectedCategoryId, searchQuery, sortBy, currentLocation]);
 
   const sortOptions: { label: string; value: SortOption }[] = [
+    { label: 'Nearest (Distance) 📍', value: 'distance' },
     { label: 'Popular', value: 'popular' },
     { label: 'Top Rated', value: 'rating' },
     { label: 'Price: Low to High', value: 'price-asc' },
@@ -57,12 +63,26 @@ export default function ExploreScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
+        {/* Search Bar */}
         <SearchBar
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Filter by title, brand, or tag..."
           onClear={() => setSearchQuery('')}
         />
+
+        {/* Location Banner */}
+        <TouchableOpacity
+          style={styles.locationBanner}
+          onPress={() => setLocationModalVisible(true)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="location-sharp" size={14} color={Colors.primary} />
+          <Text style={styles.locationBannerText} numberOfLines={1}>
+            Distance relative to: <Text style={{ fontWeight: '700' }}>{currentLocation.name || currentLocation.city}</Text>
+          </Text>
+          <Text style={styles.changeLocationText}>Change</Text>
+        </TouchableOpacity>
 
         {/* Categories Chips */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
@@ -113,34 +133,40 @@ export default function ExploreScreen() {
                 setSearchQuery('');
               }}
             >
-              <Text style={styles.resetText}>Reset Filters</Text>
+              <Text style={styles.resetFilterText}>Clear Filters</Text>
             </TouchableOpacity>
           )}
         </View>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {loading ? (
-          <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 40 }} />
-        ) : products.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Ionicons name="search" size={54} color={Colors.light.textMuted} />
-            <Text style={styles.emptyTitle}>No matching products</Text>
-            <Text style={styles.emptySubtitle}>Try changing your search query or sorting.</Text>
-          </View>
-        ) : (
-          <View style={styles.grid}>
+      {/* Product List / Grid */}
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      ) : products.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Ionicons name="search-outline" size={48} color={Colors.light.textMuted} />
+          <Text style={styles.emptyTitle}>No matching items found</Text>
+          <Text style={styles.emptySubtitle}>Try adjusting your search terms or filters.</Text>
+        </View>
+      ) : (
+        <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+          <View style={styles.productGrid}>
             {products.map(product => (
               <View key={product.id} style={styles.gridItem}>
                 <ProductCard product={product} />
               </View>
             ))}
           </View>
-        )}
-      </ScrollView>
+        </ScrollView>
+      )}
+
+      {/* Location Picker Modal */}
+      <LocationPickerModal
+        visible={locationModalVisible}
+        onClose={() => setLocationModalVisible(false)}
+      />
     </View>
   );
 }
@@ -152,10 +178,30 @@ const styles = StyleSheet.create({
   },
   topSection: {
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.md,
+    paddingTop: Spacing.sm,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: Colors.light.border,
+  },
+  locationBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.sm,
+    marginBottom: 8,
+    gap: 5,
+  },
+  locationBannerText: {
+    fontSize: 12,
+    color: Colors.light.textSecondary,
+    flex: 1,
+  },
+  changeLocationText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
   },
   categoryScroll: {
     marginBottom: 10,
@@ -164,7 +210,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: BorderRadius.full,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.light.inputBg,
     marginRight: 8,
   },
   categoryChipActive: {
@@ -185,13 +231,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: BorderRadius.md,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginRight: 6,
+    borderColor: Colors.light.border,
+    marginRight: 8,
   },
   sortChipActive: {
+    backgroundColor: Colors.primary,
     borderColor: Colors.primary,
-    backgroundColor: Colors.primaryLight,
   },
   sortChipText: {
     fontSize: 12,
@@ -199,30 +246,28 @@ const styles = StyleSheet.create({
     color: Colors.light.textSecondary,
   },
   sortChipTextActive: {
-    color: Colors.primaryDark,
+    color: '#FFFFFF',
   },
   resultsInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#F8FAFC',
+    paddingBottom: 10,
   },
   resultsCount: {
-    fontSize: 13,
+    fontSize: 12,
     color: Colors.light.textSecondary,
   },
-  resetText: {
-    fontSize: 13,
+  resetFilterText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: Colors.danger,
+    color: Colors.primary,
   },
-  scrollContent: {
+  scrollList: {
     padding: Spacing.md,
     paddingBottom: 40,
   },
-  grid: {
+  productGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
@@ -230,10 +275,16 @@ const styles = StyleSheet.create({
   gridItem: {
     width: '48%',
   },
-  emptyContainer: {
+  center: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.lg,
   },
   emptyTitle: {
     fontSize: 16,
@@ -244,7 +295,7 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     fontSize: 13,
     color: Colors.light.textSecondary,
+    textAlign: 'center',
     marginTop: 4,
   },
 });
-

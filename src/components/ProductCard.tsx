@@ -39,6 +39,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
             <Text style={styles.ratingText}>{product.rating.toFixed(1)}</Text>
             <Text style={styles.reviewsCount}>({product.reviewsCount})</Text>
           </View>
+          {product.distanceMiles !== undefined && (
+            <View style={styles.distanceRow}>
+              <Ionicons name="location-sharp" size={11} color={Colors.primary} />
+              <Text style={styles.distanceText}>{product.distanceMiles.toFixed(1)} mi</Text>
+            </View>
+          )}
           <View style={styles.priceRow}>
             <Text style={styles.price}>${product.price.toFixed(2)}</Text>
             <TouchableOpacity
@@ -81,6 +87,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
           <Text style={styles.ratingText}>{product.rating.toFixed(1)}</Text>
           <Text style={styles.reviewsCount}>({product.reviewsCount})</Text>
         </View>
+
+        {product.distanceMiles !== undefined && (
+          <View style={styles.distanceBadge}>
+            <Ionicons name="location-sharp" size={12} color={Colors.primary} />
+            <Text style={styles.distanceText}>
+              {product.distanceMiles.toFixed(1)} mi away
+            </Text>
+            {product.location?.city && (
+              <Text style={styles.distanceCity}> • {product.location.city}</Text>
+            )}
+          </View>
+        )}
 
         <View style={styles.priceRow}>
           <View>
@@ -176,6 +194,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: Colors.light.textSecondary,
     marginLeft: 4,
+  },
+  distanceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.sm,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  distanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  distanceText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.primary,
+    marginLeft: 3,
+  },
+  distanceCity: {
+    fontSize: 11,
+    color: Colors.light.textSecondary,
   },
   priceRow: {
     flexDirection: 'row',

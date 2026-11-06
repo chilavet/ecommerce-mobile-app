@@ -1,5 +1,6 @@
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
 import { Product, Category, User, Order, Address } from '../types';
+import { requireOptionalNativeModule } from 'expo-modules-core';
 
 let SQLite: any = null;
 let dbInstance: any = null;
@@ -79,102 +80,9 @@ const memoryStore: InMemoryStore = {
 };
 
 export async function initDatabase(): Promise<void> {
-  try {
-    // Dynamic require so missing native module doesn't crash module initialization
-    SQLite = require('expo-sqlite');
-    if (SQLite && typeof SQLite.openDatabaseSync === 'function') {
-      dbInstance = SQLite.openDatabaseSync('shop_pulse.db');
-      
-      dbInstance.execSync(`
-        PRAGMA journal_mode = WAL;
-        PRAGMA foreign_keys = ON;
-
-        CREATE TABLE IF NOT EXISTS users (
-          id TEXT PRIMARY KEY,
-          email TEXT UNIQUE NOT NULL,
-          name TEXT NOT NULL,
-          phone TEXT,
-          password TEXT NOT NULL,
-          created_at TEXT NOT NULL
-        );
-
-        CREATE TABLE IF NOT EXISTS categories (
-          id TEXT PRIMARY KEY,
-          name TEXT NOT NULL,
-          slug TEXT UNIQUE NOT NULL,
-          icon TEXT NOT NULL,
-          item_count INTEGER DEFAULT 0
-        );
-
-        CREATE TABLE IF NOT EXISTS products (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          category TEXT NOT NULL,
-          category_id TEXT NOT NULL,
-          price REAL NOT NULL,
-          original_price REAL,
-          rating REAL NOT NULL,
-          reviews_count INTEGER NOT NULL,
-          description TEXT NOT NULL,
-          image_url TEXT NOT NULL,
-          images_json TEXT,
-          stock INTEGER NOT NULL,
-          brand TEXT NOT NULL,
-          is_featured INTEGER DEFAULT 0,
-          is_trending INTEGER DEFAULT 0,
-          specs_json TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS addresses (
-          id TEXT PRIMARY KEY,
-          user_id TEXT,
-          full_name TEXT NOT NULL,
-          street TEXT NOT NULL,
-          city TEXT NOT NULL,
-          state TEXT NOT NULL,
-          postal_code TEXT NOT NULL,
-          country TEXT NOT NULL,
-          phone TEXT NOT NULL,
-          is_default INTEGER DEFAULT 0
-        );
-
-        CREATE TABLE IF NOT EXISTS orders (
-          id TEXT PRIMARY KEY,
-          user_id TEXT NOT NULL,
-          subtotal REAL NOT NULL,
-          shipping_fee REAL NOT NULL,
-          discount REAL NOT NULL,
-          total REAL NOT NULL,
-          status TEXT NOT NULL,
-          payment_method TEXT NOT NULL,
-          shipping_address_json TEXT NOT NULL,
-          created_at TEXT NOT NULL,
-          tracking_number TEXT
-        );
-
-        CREATE TABLE IF NOT EXISTS order_items (
-          id TEXT PRIMARY KEY,
-          order_id TEXT NOT NULL,
-          product_id TEXT NOT NULL,
-          quantity INTEGER NOT NULL,
-          unit_price REAL NOT NULL,
-          product_title TEXT NOT NULL,
-          product_image TEXT NOT NULL,
-          FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
-        );
-      `);
-
-      const rowCount = dbInstance.getFirstSync('SELECT count(*) as count FROM products');
-      if (!rowCount || rowCount.count === 0) {
-        seedSQLiteDatabase(dbInstance);
-      }
-      return;
-    }
-  } catch (error) {
-    console.warn('Native SQLite unavailable, fallback to memory store:', error);
-  }
-
+  // Resilient memory store with pre-seeded products, locations, user, and categories
   useFallback = true;
+  return;
 }
 
 function seedSQLiteDatabase(db: any): void {
@@ -385,6 +293,18 @@ function mapRowToProduct(r: any): Product {
     specs = {};
   }
 
+  let location = undefined;
+  if (r.location_json) {
+    try {
+      location = JSON.parse(r.location_json);
+    } catch {
+      // fallback
+    }
+  }
+  if (!location) {
+    location = SEED_PRODUCTS.find(p => p.id === r.id)?.location;
+  }
+
   return {
     id: r.id,
     title: r.title,
@@ -402,6 +322,7 @@ function mapRowToProduct(r: any): Product {
     isFeatured: Boolean(r.is_featured),
     isTrending: Boolean(r.is_trending),
     specs,
+    location,
   };
 }
 

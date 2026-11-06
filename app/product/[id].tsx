@@ -16,10 +16,13 @@ import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { Product } from '@/src/types';
 import { getProductById } from '@/src/database/db';
 import { useCart } from '@/src/context/CartContext';
+import { useLocation } from '@/src/context/LocationContext';
+import { openGoogleMaps, openGoogleMapsDirections, getDeliveryEstimate } from '@/src/utils/location';
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { addToCart } = useCart();
+  const { currentLocation, enrichProductWithDistance } = useLocation();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string>('');
@@ -33,8 +36,9 @@ export default function ProductDetailScreen() {
       try {
         const prod = await getProductById(id);
         if (prod) {
-          setProduct(prod);
-          setSelectedImage(prod.imageUrl);
+          const enriched = enrichProductWithDistance(prod);
+          setProduct(enriched);
+          setSelectedImage(enriched.imageUrl);
         }
       } catch (err) {
         console.error('Error fetching product:', err);
@@ -43,7 +47,7 @@ export default function ProductDetailScreen() {
       }
     }
     load();
-  }, [id]);
+  }, [id, currentLocation]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -184,6 +188,88 @@ export default function ProductDetailScreen() {
                     <Text style={styles.specValue}>{val}</Text>
                   </View>
                 ))}
+              </View>
+            </View>
+          )}
+
+          {/* Store Location & Google Maps Connection */}
+          {product.location && (
+            <View style={styles.locationSection}>
+              <Text style={styles.sectionHeader}>Store &amp; Warehouse Location</Text>
+              <View style={[styles.locationCard, Shadows.sm]}>
+                <View style={styles.locationCardHeader}>
+                  <View style={styles.storeIconCircle}>
+                    <Ionicons name="storefront" size={20} color={Colors.primary} />
+                  </View>
+                  <View style={styles.storeHeaderInfo}>
+                    <Text style={styles.storeName}>{product.location.name}</Text>
+                    <Text style={styles.storeAddress}>
+                      {product.location.address}, {product.location.city}, {product.location.state} {product.location.postalCode}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Distance Badge & Delivery Speed */}
+                <View style={styles.distanceInfoRow}>
+                  <View style={styles.distancePill}>
+                    <Ionicons name="location-sharp" size={14} color={Colors.primary} />
+                    <Text style={styles.distancePillText}>
+                      {product.distanceMiles !== undefined
+                        ? `${product.distanceMiles.toFixed(1)} miles from your location`
+                        : 'Nearby store'}
+                    </Text>
+                  </View>
+                  {product.distanceMiles !== undefined && (
+                    <View style={styles.deliveryBadge}>
+                      <Ionicons
+                        name="flash"
+                        size={12}
+                        color={getDeliveryEstimate(product.distanceMiles).color}
+                      />
+                      <Text
+                        style={[
+                          styles.deliveryBadgeText,
+                          { color: getDeliveryEstimate(product.distanceMiles).color },
+                        ]}
+                      >
+                        {getDeliveryEstimate(product.distanceMiles).badge} ({getDeliveryEstimate(product.distanceMiles).time})
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* Google Maps Actions */}
+                <View style={styles.mapButtonsRow}>
+                  <TouchableOpacity
+                    style={styles.googleMapsBtn}
+                    onPress={() =>
+                      openGoogleMaps(
+                        product.location!.latitude,
+                        product.location!.longitude,
+                        product.location!.name
+                      )
+                    }
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="map" size={16} color="#FFFFFF" />
+                    <Text style={styles.googleMapsBtnText}>Open in Google Maps</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.directionsBtn}
+                    onPress={() =>
+                      openGoogleMapsDirections(
+                        product.location!.latitude,
+                        product.location!.longitude,
+                        `${product.location!.address}, ${product.location!.city}`
+                      )
+                    }
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="navigate-outline" size={16} color={Colors.primary} />
+                    <Text style={styles.directionsBtnText}>Directions</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -484,6 +570,112 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  locationSection: {
+    marginBottom: Spacing.lg,
+  },
+  locationCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.light.border,
+  },
+  locationCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  storeIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  storeHeaderInfo: {
+    flex: 1,
+  },
+  storeName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.light.text,
+  },
+  storeAddress: {
+    fontSize: 12,
+    color: Colors.light.textSecondary,
+    marginTop: 2,
+  },
+  distanceInfoRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  distancePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.sm,
+    gap: 4,
+  },
+  distancePillText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+  deliveryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ECFDF5',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.sm,
+    gap: 4,
+  },
+  deliveryBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  mapButtonsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  googleMapsBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EA4335',
+    paddingVertical: 10,
+    borderRadius: BorderRadius.md,
+    gap: 6,
+  },
+  googleMapsBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  directionsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: BorderRadius.md,
+    gap: 4,
+  },
+  directionsBtnText: {
+    color: Colors.primary,
+    fontSize: 12,
+    fontWeight: '700',
   },
   bottomBar: {
     position: 'absolute',

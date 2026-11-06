@@ -1,3 +1,25 @@
+export interface StoreLocation {
+  name: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  phone?: string;
+}
+
+export interface UserLocation {
+  id?: string;
+  name: string;
+  city: string;
+  state: string;
+  formattedAddress: string;
+  latitude: number;
+  longitude: number;
+  isCurrent?: boolean;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -32,6 +54,8 @@ export interface Product {
   isTrending?: boolean;
   tags?: string[];
   specs?: Record<string, string>;
+  location?: StoreLocation;
+  distanceMiles?: number;
 }
 
 export interface CartItem {
