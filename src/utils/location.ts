@@ -109,3 +109,4 @@ export async function openGoogleMapsSearch(query: string): Promise<void> {
     console.warn('Could not open Google Maps search:', err);
   }
 }
+
