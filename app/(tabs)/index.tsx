@@ -18,9 +18,11 @@ import { ProductCard } from '@/src/components/ProductCard';
 import { CategoryPill } from '@/src/components/CategoryPill';
 import { SearchBar } from '@/src/components/SearchBar';
 import { useAuth } from '@/src/context/AuthContext';
+import { useNotifications } from '@/src/context/NotificationContext';
 
 export default function ShopHomeScreen() {
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -71,9 +73,22 @@ export default function ShopHomeScreen() {
         </View>
         <TouchableOpacity
           style={styles.notificationBtn}
-          onPress={() => router.push('/(tabs)/orders')}
+          onPress={() => router.push('/notifications')}
+          accessibilityLabel="Notifications"
+          accessibilityRole="button"
         >
-          <Ionicons name="notifications-outline" size={22} color={Colors.light.text} />
+          <Ionicons
+            name={unreadCount > 0 ? "notifications" : "notifications-outline"}
+            size={22}
+            color={unreadCount > 0 ? Colors.primary : Colors.light.text}
+          />
+          {unreadCount > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadBadgeText}>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -203,6 +218,26 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  unreadBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: Colors.danger,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  unreadBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
   },
   banner: {
     backgroundColor: Colors.primary,

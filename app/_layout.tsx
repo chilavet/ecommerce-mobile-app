@@ -63,10 +63,17 @@ export default function RootLayout() {
               }}
             />
             <Stack.Screen
-              name="notifications-settings"
+              name="notifications"
               options={{
                 title: 'Notifications',
-                headerBackTitle: 'Account',
+                headerBackTitle: 'Home',
+              }}
+            />
+            <Stack.Screen
+              name="notifications-settings"
+              options={{
+                title: 'Notification Preferences',
+                headerBackTitle: 'Back',
               }}
             />
           </Stack>
