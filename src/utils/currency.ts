@@ -16,3 +16,4 @@ export const formatNaira = (amount: number, showDecimals: boolean = false): stri
 };
 
 export default formatNaira;
+

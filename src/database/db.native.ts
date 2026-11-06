@@ -89,7 +89,7 @@ function seedSQLiteDatabase(db: any): void {
   try {
     db.runSync(
       'INSERT OR IGNORE INTO users (id, email, name, phone, password, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-      ['usr_demo', 'alex@example.com', 'Alex Johnson', '+1 (555) 234-5678', 'password123', new Date().toISOString()]
+      ['usr_demo', 'alex@example.com', 'Alex Johnson', '+234 803 123 4567', 'password123', new Date().toISOString()]
     );
 
     db.runSync(
@@ -525,7 +525,7 @@ export async function createOrder(order: Order): Promise<Order> {
         order.total,
         order.status,
         order.paymentMethod,
-        JSON.stringify(order.shippingAddress),
+        JSON.stringify(order.shippingAddress || null),
         order.createdAt,
         order.trackingNumber || '',
       ]

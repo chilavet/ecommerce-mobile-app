@@ -1,11 +1,21 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Tabs, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/src/constants/theme';
 import { useCart } from '@/src/context/CartContext';
+import { useAuth } from '@/src/context/AuthContext';
 
 export default function TabLayout() {
   const { totalCount } = useCart();
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (!user) {
+    return <Redirect href="/login" />;
+  }
 
   return (
     <Tabs

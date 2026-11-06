@@ -154,7 +154,14 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out of your account?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign Out', style: 'destructive', onPress: logout },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: () => {
+          logout();
+          router.replace('/login');
+        },
+      },
     ]);
   };
 
@@ -244,9 +251,9 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* 3. Section: Delivery & Payment */}
+      {/* 3. Section: Wallet & Payment */}
       <View style={[styles.menuSection, Shadows.sm]}>
-        <Text style={styles.sectionTitle}>Delivery &amp; Payment</Text>
+        <Text style={styles.sectionTitle}>Wallet &amp; Payment</Text>
 
         {/* Digital Wallet */}
         <TouchableOpacity
@@ -275,27 +282,6 @@ export default function ProfileScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Primary Delivery Address */}
-        <TouchableOpacity
-          style={styles.menuRow}
-          onPress={() => setLocationModalVisible(true)}
-          activeOpacity={0.7}
-        >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#EFF6FF' }]}>
-            <Ionicons name="navigate-outline" size={20} color={Colors.primary} />
-          </View>
-          <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.menuLabel}>Delivery Address</Text>
-            <Text style={styles.menuSubLabel} numberOfLines={1}>
-              {currentLocation.formattedAddress}
-            </Text>
-          </View>
-          <View style={styles.changeBadge}>
-            <Text style={styles.changeBadgeText}>Change</Text>
-            <Ionicons name="chevron-forward" size={14} color={Colors.primary} />
-          </View>
-        </TouchableOpacity>
-
         {/* Payment Methods */}
         <TouchableOpacity
           style={[styles.menuRow, { borderBottomWidth: 0 }]}
@@ -307,7 +293,7 @@ export default function ProfileScreen() {
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
             <Text style={styles.menuLabel}>Payment Options</Text>
-            <Text style={styles.menuSubLabel}>Paystack, Wallet, Visa •••• 4242</Text>
+            <Text style={styles.menuSubLabel}>Wallet &amp; Card (Mastercard, Visa, Verve)</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
         </TouchableOpacity>
@@ -461,7 +447,7 @@ export default function ProfileScreen() {
                   </View>
                 </View>
                 <Text style={styles.paymentCardSubtitle}>
-                  Balance: {currency}{balance.toFixed(2)} • 1-tap pay
+                  Balance: {formatNaira(balance)} • 1-tap pay
                 </Text>
               </View>
               <View style={[styles.defaultBadge, { backgroundColor: '#EFF6FF' }]}>
@@ -469,43 +455,23 @@ export default function ProfileScreen() {
               </View>
             </TouchableOpacity>
 
-            {/* 2. Paystack Card & Transfer Gateway */}
+            {/* 2. Pay with Card (Paystack Secured) */}
             <View style={styles.paymentCard}>
               <View style={[styles.paymentIconBox, { backgroundColor: '#E0F2FE' }]}>
-                <Ionicons name="flash" size={20} color="#0BA4DB" />
+                <Ionicons name="card-outline" size={22} color="#0BA4DB" />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.paymentCardTitle}>Paystack Gateway</Text>
-                <Text style={styles.paymentCardSubtitle}>Cards, Bank Transfer, USSD</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={styles.paymentCardTitle}>Pay with Card</Text>
+                  <View style={styles.walletPill}>
+                    <Text style={styles.walletPillText}>PAYSTACK</Text>
+                  </View>
+                </View>
+                <Text style={styles.paymentCardSubtitle}>Mastercard, Visa, Verve • Instant</Text>
               </View>
               <View style={styles.defaultBadge}>
                 <Text style={styles.defaultBadgeText}>ACTIVE</Text>
               </View>
-            </View>
-
-            {/* 3. Saved Visa */}
-            <View style={styles.paymentCard}>
-              <View style={styles.paymentIconBox}>
-                <Ionicons name="card" size={24} color={Colors.primary} />
-              </View>
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.paymentCardTitle}>Visa ending in 4242</Text>
-                <Text style={styles.paymentCardSubtitle}>Expires 12/28 • Default Payment</Text>
-              </View>
-              <View style={styles.defaultBadge}>
-                <Text style={styles.defaultBadgeText}>DEFAULT</Text>
-              </View>
-            </View>
-
-            <View style={styles.paymentCard}>
-              <View style={[styles.paymentIconBox, { backgroundColor: '#F1F5F9' }]}>
-                <Ionicons name="logo-google" size={22} color="#4285F4" />
-              </View>
-              <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.paymentCardTitle}>Google Pay</Text>
-                <Text style={styles.paymentCardSubtitle}>Connected on this device</Text>
-              </View>
-              <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
             </View>
 
             <TouchableOpacity
@@ -655,7 +621,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: Spacing.md,
-    paddingBottom: 40,
+    paddingBottom: 110,
   },
   profileCard: {
     flexDirection: 'row',

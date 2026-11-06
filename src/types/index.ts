@@ -114,7 +114,7 @@ export interface Order {
   status: OrderStatus;
   paymentMethod: PaymentMethod;
   paymentReference?: string;
-  shippingAddress: Address;
+  shippingAddress?: Address;
   createdAt: string;
   trackingNumber?: string;
 }

@@ -27,11 +27,11 @@ export default function WalletScreen() {
 
   // Fund Wallet Modal state
   const [fundModalVisible, setFundModalVisible] = useState(false);
-  const [topUpAmount, setTopUpAmount] = useState('50');
+  const [topUpAmount, setTopUpAmount] = useState('');
 
   // Paystack Gateway Modal state
   const [paystackVisible, setPaystackVisible] = useState(false);
-  const [fundingAmountNumber, setFundingAmountNumber] = useState(50);
+  const [fundingAmountNumber, setFundingAmountNumber] = useState(10000);
 
   // Filter state for transactions
   const [filter, setFilter] = useState<'all' | 'credit' | 'debit'>('all');
@@ -44,6 +44,8 @@ export default function WalletScreen() {
   const handleOpenFundModal = (preset?: number) => {
     if (preset) {
       setTopUpAmount(preset.toString());
+    } else {
+      setTopUpAmount('');
     }
     setFundModalVisible(true);
   };
@@ -127,7 +129,7 @@ export default function WalletScreen() {
       <View style={styles.actionsBar}>
         <TouchableOpacity
           style={[styles.fundActionBtn, Shadows.md]}
-          onPress={() => handleOpenFundModal(10000)}
+          onPress={() => handleOpenFundModal()}
           activeOpacity={0.85}
         >
           <View style={styles.fundIconCircle}>
@@ -141,31 +143,7 @@ export default function WalletScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* 3. Quick Top-up Chips */}
-      <View style={styles.quickTopUpSection}>
-        <Text style={styles.sectionSubtitle}>QUICK TOP-UP AMOUNTS</Text>
-        <View style={styles.chipsRow}>
-          {[5000, 10000, 25000, 50000].map(amt => (
-            <TouchableOpacity
-              key={amt}
-              style={[styles.quickChip, Shadows.sm]}
-              onPress={() => handleOpenFundModal(amt)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.quickChipText}>+{formatNaira(amt)}</Text>
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity
-            style={[styles.quickChip, styles.customChip, Shadows.sm]}
-            onPress={() => handleOpenFundModal()}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.quickChipText, styles.customChipText]}>Custom</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* 4. Transactions List */}
+      {/* 3. Transactions List */}
       <View style={styles.transactionsHeaderRow}>
         <View>
           <Text style={styles.transactionsTitle}>Transaction History</Text>
@@ -322,28 +300,6 @@ export default function WalletScreen() {
                 placeholder="10000"
                 autoFocus
               />
-            </View>
-
-            <View style={styles.fundModalChips}>
-              {[5000, 10000, 25000, 50000].map(amt => (
-                <TouchableOpacity
-                  key={amt}
-                  style={[
-                    styles.fundModalChip,
-                    topUpAmount === amt.toString() && styles.fundModalChipActive,
-                  ]}
-                  onPress={() => setTopUpAmount(amt.toString())}
-                >
-                  <Text
-                    style={[
-                      styles.fundModalChipText,
-                      topUpAmount === amt.toString() && styles.fundModalChipTextActive,
-                    ]}
-                  >
-                    +{formatNaira(amt)}
-                  </Text>
-                </TouchableOpacity>
-              ))}
             </View>
 
             <View style={styles.paystackNotice}>

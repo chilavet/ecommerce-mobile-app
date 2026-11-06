@@ -31,17 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     async function setup() {
       try {
         await initDatabase();
-        // Load default demo user for frictionless immediate experience
-        const demo = await getUserByEmail('alex@example.com');
-        if (demo) {
-          setUser({
-            id: demo.id,
-            email: demo.email,
-            name: demo.name,
-            phone: demo.phone,
-            createdAt: demo.createdAt,
-          });
-        }
+        // User starts unauthenticated so the Sign In screen is presented first
+        setUser(null);
       } catch (err) {
         console.error('Failed to init auth context:', err);
       } finally {
