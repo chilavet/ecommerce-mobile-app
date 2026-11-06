@@ -20,6 +20,7 @@ import { useWallet } from '@/src/context/WalletContext';
 import { getOrders } from '@/src/database/db';
 import { LocationPickerModal } from '@/src/components/LocationPickerModal';
 import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
+import { formatNaira } from '@/src/utils/currency';
 
 export default function ProfileScreen() {
   const { user, login, register, logout } = useAuth();
@@ -265,7 +266,7 @@ export default function ProfileScreen() {
               </View>
             </View>
             <Text style={styles.menuSubLabel}>
-              Balance: {currency}{balance.toFixed(2)} • 1-tap checkout
+              Balance: {formatNaira(balance)} • 1-tap checkout
             </Text>
           </View>
           <View style={[styles.changeBadge, { backgroundColor: '#ECFDF5' }]}>

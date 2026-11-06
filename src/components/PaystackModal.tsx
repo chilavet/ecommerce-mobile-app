@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, BorderRadius, Shadows, Spacing } from '@/src/constants/theme';
+import { formatNaira } from '@/src/utils/currency';
 
 export interface PaystackSuccessResponse {
   reference: string;
@@ -37,7 +38,7 @@ type PaystackChannel = 'card' | 'transfer' | 'ussd';
 export function PaystackModal({
   visible,
   amount,
-  currency = '$',
+  currency = '₦',
   email,
   purpose = 'Payment',
   onSuccess,
@@ -248,7 +249,7 @@ export function PaystackModal({
             </View>
             <View style={{ alignItems: 'flex-end' }}>
               <Text style={styles.amountText}>
-                {currency}{amount.toFixed(2)}
+                {formatNaira(amount)}
               </Text>
               <View style={styles.testBadge}>
                 <Text style={styles.testBadgeText}>TEST MODE</Text>
@@ -271,7 +272,7 @@ export function PaystackModal({
                 <View style={styles.receiptRow}>
                   <Text style={styles.receiptRowLabel}>Amount Paid</Text>
                   <Text style={styles.receiptRowVal}>
-                    {currency}{amount.toFixed(2)}
+                    {formatNaira(amount)}
                   </Text>
                 </View>
                 <View style={styles.receiptRow}>
@@ -501,7 +502,7 @@ export function PaystackModal({
                       <>
                         <Ionicons name="lock-closed" size={16} color="#FFFFFF" />
                         <Text style={styles.payBtnText}>
-                          Pay {currency}{amount.toFixed(2)}
+                          Pay {formatNaira(amount)}
                         </Text>
                       </>
                     )}
@@ -533,7 +534,7 @@ export function PaystackModal({
                   </View>
 
                   <Text style={styles.transferInstructions}>
-                    Transfer exactly {currency}{amount.toFixed(2)} to the dedicated account above. Your transaction will be confirmed automatically.
+                    Transfer exactly {formatNaira(amount)} to the dedicated account above. Your transaction will be confirmed automatically.
                   </Text>
 
                   <TouchableOpacity

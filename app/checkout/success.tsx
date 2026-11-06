@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
+import { formatNaira } from '@/src/utils/currency';
 
 export default function OrderSuccessScreen() {
   const { orderId, total, trackingNumber } = useLocalSearchParams<{
@@ -31,7 +32,7 @@ export default function OrderSuccessScreen() {
           <View style={styles.receiptRow}>
             <Text style={styles.receiptLabel}>Total Paid</Text>
             <Text style={[styles.receiptValue, { color: Colors.primary, fontWeight: '800' }]}>
-              ${total || '0.00'}
+              {formatNaira(parseFloat(total || '0'))}
             </Text>
           </View>
 

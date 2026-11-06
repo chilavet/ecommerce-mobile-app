@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { CartItem, Product, PromoCode } from '../types';
 import { PROMO_CODES } from '../database/seedData';
+import { formatNaira } from '../utils/currency';
 
 interface CartContextType {
   items: CartItem[];
@@ -106,7 +107,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (promo.minOrder && currentSubtotal < promo.minOrder) {
       return {
         success: false,
-        message: `This coupon requires a minimum spend of $${promo.minOrder.toFixed(2)}.`,
+        message: `This coupon requires a minimum spend of ${formatNaira(promo.minOrder)}.`,
       };
     }
     setAppliedPromo(promo);
@@ -118,7 +119,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const shippingFee = subtotal > 100 || items.length === 0 ? 0 : 9.99;
+  const shippingFee = subtotal >= 100000 || items.length === 0 ? 0 : 3500;
   const discount = appliedPromo ? (subtotal * appliedPromo.discountPercentage) / 100 : 0;
   const total = Math.max(0, subtotal - discount + (items.length > 0 ? shippingFee : 0));
   const totalCount = items.reduce((count, item) => count + item.quantity, 0);

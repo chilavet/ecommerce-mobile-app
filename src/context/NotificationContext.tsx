@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import { sendLocalPushNotification } from '../utils/notifications';
+import { formatNaira } from '../utils/currency';
 
 export interface NotificationPreferences {
   // Push Notifications
@@ -155,7 +156,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const sendOrderConfirmation = async (orderId: string, total: number, userEmail?: string) => {
     const formattedId = orderId.replace('ord_', '');
     const title = 'Order Confirmed! 🛍️';
-    const body = `Order #${formattedId} for $${total.toFixed(2)} has been placed and is being prepared!`;
+    const body = `Order #${formattedId} for ${formatNaira(total)} has been placed and is being prepared!`;
 
     // 1. Add in-app notification
     addNotification({

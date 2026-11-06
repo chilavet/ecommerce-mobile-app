@@ -3,6 +3,7 @@ import { WalletTransaction, WalletTransactionChannel } from '@/src/types';
 import { useNotifications } from '@/src/context/NotificationContext';
 import { sendLocalPushNotification } from '@/src/utils/notifications';
 import { useAuth } from '@/src/context/AuthContext';
+import { formatNaira } from '@/src/utils/currency';
 
 interface WalletContextType {
   balance: number;
@@ -28,7 +29,7 @@ const INITIAL_TRANSACTIONS: WalletTransaction[] = [
     id: 'tx_3',
     userId: 'usr_demo',
     type: 'credit',
-    amount: 100.0,
+    amount: 100000,
     description: 'Wallet Top-up via Paystack',
     channel: 'paystack',
     reference: 'PSTK_PAY_894120',
@@ -39,7 +40,7 @@ const INITIAL_TRANSACTIONS: WalletTransaction[] = [
     id: 'tx_2',
     userId: 'usr_demo',
     type: 'debit',
-    amount: 25.0,
+    amount: 25000,
     description: 'Payment for Order #1000',
     channel: 'checkout',
     reference: 'ORD_1000_PMT',
@@ -50,10 +51,10 @@ const INITIAL_TRANSACTIONS: WalletTransaction[] = [
     id: 'tx_1',
     userId: 'usr_demo',
     type: 'credit',
-    amount: 50.0,
+    amount: 75000,
     description: 'Welcome Bonus Credit',
     channel: 'bonus',
-    reference: 'BONUS_WELCOME_50',
+    reference: 'BONUS_WELCOME_75',
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     status: 'successful',
   },
@@ -63,8 +64,8 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const { addNotification } = useNotifications();
 
-  const [balance, setBalance] = useState<number>(125.0);
-  const [currency] = useState<string>('$');
+  const [balance, setBalance] = useState<number>(150000);
+  const [currency] = useState<string>('₦');
   const [transactions, setTransactions] = useState<WalletTransaction[]>(INITIAL_TRANSACTIONS);
 
   const fundWallet = async (
@@ -92,13 +93,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     // Send push notification & in-app alert
     await sendLocalPushNotification({
       title: 'Wallet Funded Successfully! 💳',
-      body: `+$${amount.toFixed(2)} deposited into your ShopPulse Wallet via Paystack. New balance: $${newBal.toFixed(2)}.`,
+      body: `+${formatNaira(amount)} deposited into your ShopPulse Wallet via Paystack. New balance: ${formatNaira(newBal)}.`,
       data: { type: 'wallet_funded', reference, amount, balance: newBal },
     });
 
     addNotification({
       title: 'Wallet Top-up Successful',
-      body: `+$${amount.toFixed(2)} deposited via Paystack. Balance: $${newBal.toFixed(2)}.`,
+      body: `+${formatNaira(amount)} deposited via Paystack. Balance: ${formatNaira(newBal)}.`,
       type: 'order',
     });
 
@@ -112,7 +113,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     if (balance < amount) {
       return {
         success: false,
-        error: `Insufficient wallet balance. Available: $${balance.toFixed(2)}, Required: $${amount.toFixed(2)}.`,
+        error: `Insufficient wallet balance. Available: ${formatNaira(balance)}, Required: ${formatNaira(amount)}.`,
       };
     }
 
@@ -136,13 +137,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     // Send notification
     await sendLocalPushNotification({
       title: 'Wallet Payment Confirmed 🛍️',
-      body: `Paid $${amount.toFixed(2)} for Order #${orderId} using your wallet. Remaining balance: $${newBal.toFixed(2)}.`,
+      body: `Paid ${formatNaira(amount)} for Order #${orderId} using your wallet. Remaining balance: ${formatNaira(newBal)}.`,
       data: { type: 'wallet_debit', orderId, amount, balance: newBal },
     });
 
     addNotification({
       title: 'Wallet Payment Debited',
-      body: `Paid $${amount.toFixed(2)} for Order #${orderId}. Remaining balance: $${newBal.toFixed(2)}.`,
+      body: `Paid ${formatNaira(amount)} for Order #${orderId}. Remaining balance: ${formatNaira(newBal)}.`,
       type: 'order',
     });
 

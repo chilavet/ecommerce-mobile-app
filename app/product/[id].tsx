@@ -18,6 +18,7 @@ import { getProductById } from '@/src/database/db';
 import { useCart } from '@/src/context/CartContext';
 import { useLocation } from '@/src/context/LocationContext';
 import { openGoogleMaps, openGoogleMapsDirections, getDeliveryEstimate } from '@/src/utils/location';
+import { formatNaira } from '@/src/utils/currency';
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -159,9 +160,9 @@ export default function ProductDetailScreen() {
 
           {/* Price Box */}
           <View style={styles.priceContainer}>
-            <Text style={styles.currentPrice}>${product.price.toFixed(2)}</Text>
+            <Text style={styles.currentPrice}>{formatNaira(product.price)}</Text>
             {product.originalPrice && (
-              <Text style={styles.oldPrice}>${product.originalPrice.toFixed(2)}</Text>
+              <Text style={styles.oldPrice}>{formatNaira(product.originalPrice)}</Text>
             )}
           </View>
 

@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CartItem } from '../types';
 import { Colors, BorderRadius, Spacing } from '../constants/theme';
 import { useCart } from '../context/CartContext';
+import { formatNaira } from '../utils/currency';
 
 interface CartItemRowProps {
   item: CartItem;
@@ -33,7 +34,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
         </Text>
 
         <View style={styles.bottomRow}>
-          <Text style={styles.price}>${(product.price * quantity).toFixed(2)}</Text>
+          <Text style={styles.price}>{formatNaira(product.price * quantity)}</Text>
 
           <View style={styles.stepper}>
             <TouchableOpacity

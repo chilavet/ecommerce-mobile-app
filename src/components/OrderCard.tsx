@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Order, OrderStatus } from '../types';
 import { Colors, BorderRadius, Spacing, Shadows } from '../constants/theme';
+import { formatNaira } from '../utils/currency';
 
 interface OrderCardProps {
   order: Order;
@@ -69,7 +70,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order }) => {
           <Text style={styles.itemsCount}>
             {order.items.reduce((s, i) => s + i.quantity, 0)} items
           </Text>
-          <Text style={styles.totalPrice}>${order.total.toFixed(2)}</Text>
+          <Text style={styles.totalPrice}>{formatNaira(order.total)}</Text>
         </View>
       </View>
 

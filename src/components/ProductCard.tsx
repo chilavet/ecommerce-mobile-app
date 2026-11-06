@@ -5,6 +5,7 @@ import { Product } from '../types';
 import { Colors, BorderRadius, Shadows, Spacing } from '../constants/theme';
 import { useCart } from '../context/CartContext';
 import { router } from 'expo-router';
+import { formatNaira } from '../utils/currency';
 
 interface ProductCardProps {
   product: Product;
@@ -46,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
             </View>
           )}
           <View style={styles.priceRow}>
-            <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+            <Text style={styles.price}>{formatNaira(product.price)}</Text>
             <TouchableOpacity
               onPress={() => addToCart(product, 1)}
               style={styles.smallAddButton}
@@ -102,9 +103,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
 
         <View style={styles.priceRow}>
           <View>
-            <Text style={styles.price}>${product.price.toFixed(2)}</Text>
+            <Text style={styles.price}>{formatNaira(product.price)}</Text>
             {product.originalPrice && (
-              <Text style={styles.originalPrice}>${product.originalPrice.toFixed(2)}</Text>
+              <Text style={styles.originalPrice}>{formatNaira(product.originalPrice)}</Text>
             )}
           </View>
 

@@ -21,6 +21,7 @@ import { useWallet } from '@/src/context/WalletContext';
 import { PaystackModal, PaystackSuccessResponse } from '@/src/components/PaystackModal';
 import { getAddresses, saveAddress, createOrder } from '@/src/database/db';
 import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
+import { formatNaira } from '@/src/utils/currency';
 import { Switch } from 'react-native';
 
 type PaymentType = 'wallet' | 'paystack' | 'card' | 'apple_pay' | 'cod';
@@ -96,10 +97,10 @@ export default function CheckoutScreen() {
       fullName,
       street,
       city,
-      state: state || 'CA',
+      state: state || 'Lagos State',
       postalCode,
-      country: 'United States',
-      phone: phone || '+1 (555) 000-0000',
+      country: 'Nigeria',
+      phone: phone || '+234 803 123 4567',
       isDefault: true,
     };
 
@@ -133,7 +134,7 @@ export default function CheckoutScreen() {
       if (!hasSufficientBalance(total)) {
         Alert.alert(
           'Insufficient Wallet Balance',
-          `Your wallet balance ($${balance.toFixed(2)}) is insufficient for this order ($${total.toFixed(2)}).\n\nWould you like to pay with your card via Paystack?`,
+          `Your wallet balance (${formatNaira(balance)}) is insufficient for this order (${formatNaira(total)}).\n\nWould you like to pay with your card via Paystack?`,
           [
             { text: 'Cancel', style: 'cancel' },
             {
@@ -152,7 +153,7 @@ export default function CheckoutScreen() {
 
     if (biometricsEnabled) {
       const bioAuth = await authenticateWithBiometrics(
-        `Confirm payment of $${total.toFixed(2)} with ${biometrics.biometricName}`
+        `Confirm payment of ${formatNaira(total)} with ${biometrics.biometricName}`
       );
 
       if (bioAuth.notEnrolled) {
@@ -207,7 +208,7 @@ export default function CheckoutScreen() {
         paymentReference: paystackRef || (paymentMethod === 'wallet' ? `WLT_${orderId}` : undefined),
         shippingAddress: selectedAddr,
         createdAt: new Date().toISOString(),
-        trackingNumber: `TRK-${Math.floor(10000000 + Math.random() * 90000000)}-US`,
+        trackingNumber: `TRK-${Math.floor(100000 + Math.random() * 900000)}-NG`,
         items: items.map(item => ({
           id: `ord_item_${Date.now()}_${item.product.id}`,
           orderId,
@@ -372,7 +373,7 @@ export default function CheckoutScreen() {
                 </View>
               </View>
               <Text style={styles.methodSubtitle}>
-                Balance: ${balance.toFixed(2)} • {hasSufficientBalance(total) ? '1-tap instant pay' : `$${(total - balance).toFixed(2)} needed`}
+                Balance: {formatNaira(balance)} • {hasSufficientBalance(total) ? '1-tap instant pay' : `${formatNaira(total - balance)} needed`}
               </Text>
             </View>
             <TouchableOpacity
@@ -517,14 +518,14 @@ export default function CheckoutScreen() {
 
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Items ({items.length})</Text>
-            <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
+            <Text style={styles.summaryValue}>{formatNaira(subtotal)}</Text>
           </View>
 
           {discount > 0 && (
             <View style={styles.summaryRow}>
               <Text style={[styles.summaryLabel, { color: Colors.success }]}>Discount</Text>
               <Text style={[styles.summaryValue, { color: Colors.success }]}>
-                -${discount.toFixed(2)}
+                -{formatNaira(discount)}
               </Text>
             </View>
           )}
@@ -532,7 +533,7 @@ export default function CheckoutScreen() {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Shipping</Text>
             <Text style={styles.summaryValue}>
-              {shippingFee === 0 ? 'FREE' : `$${shippingFee.toFixed(2)}`}
+              {shippingFee === 0 ? 'FREE' : formatNaira(shippingFee)}
             </Text>
           </View>
 
@@ -540,7 +541,7 @@ export default function CheckoutScreen() {
 
           <View style={styles.summaryRow}>
             <Text style={styles.totalLabel}>Total Due</Text>
-            <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>{formatNaira(total)}</Text>
           </View>
         </View>
       </ScrollView>
@@ -549,7 +550,7 @@ export default function CheckoutScreen() {
       <View style={[styles.bottomBar, Shadows.lg]}>
         <View>
           <Text style={styles.bottomTotalLabel}>Total</Text>
-          <Text style={styles.bottomTotalValue}>${total.toFixed(2)}</Text>
+          <Text style={styles.bottomTotalValue}>{formatNaira(total)}</Text>
         </View>
 
         <TouchableOpacity
@@ -569,10 +570,10 @@ export default function CheckoutScreen() {
             <>
               <Text style={styles.placeOrderBtnText}>
                 {paymentMethod === 'wallet'
-                  ? `Pay $${total.toFixed(2)} with Wallet`
+                  ? `Pay ${formatNaira(total)} with Wallet`
                   : paymentMethod === 'paystack'
-                  ? `Pay $${total.toFixed(2)} via Paystack`
-                  : `Place Order ($${total.toFixed(2)})`}
+                  ? `Pay ${formatNaira(total)} via Paystack`
+                  : `Place Order (${formatNaira(total)})`}
               </Text>
               <Ionicons
                 name={paymentMethod === 'paystack' ? 'flash' : 'lock-closed'}
@@ -589,7 +590,7 @@ export default function CheckoutScreen() {
       <PaystackModal
         visible={paystackVisible}
         amount={total}
-        currency="$"
+        currency="₦"
         email={user?.email || 'alex@example.com'}
         purpose="ShopPulse Order Checkout"
         onSuccess={handlePaystackSuccess}

@@ -286,6 +286,30 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* App Info & Splash Screen */}
+        <View style={[styles.card, Shadows.sm]}>
+          <View style={styles.sectionHeader}>
+            <View style={[styles.iconCircle, { backgroundColor: '#EFF6FF' }]}>
+              <Ionicons name="sparkles" size={20} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.cardTitle}>App Identity &amp; Splash</Text>
+              <Text style={styles.cardSubtitle}>ShopPulse v1.0.0 (Nigeria Edition 🇳🇬)</Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.replaySplashBtn}
+            onPress={() => router.push('/splash')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="play-circle-outline" size={18} color={Colors.primary} />
+            <Text style={styles.replaySplashBtnText}>View Splash Screen</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Section 3: Delete Account (Danger Zone) */}
         <View style={[styles.card, styles.dangerCard, Shadows.sm]}>
           <View style={styles.sectionHeader}>
@@ -449,6 +473,22 @@ const styles = StyleSheet.create({
   },
   savePasswordBtnText: {
     color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  replaySplashBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+    height: 44,
+    borderRadius: BorderRadius.full,
+    gap: 8,
+  },
+  replaySplashBtnText: {
+    color: Colors.primary,
     fontWeight: '700',
     fontSize: 14,
   },

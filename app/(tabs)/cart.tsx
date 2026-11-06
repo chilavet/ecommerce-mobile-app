@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useCart } from '@/src/context/CartContext';
 import { CartItemRow } from '@/src/components/CartItemRow';
+import { formatNaira } from '@/src/utils/currency';
 
 export default function CartScreen() {
   const {
@@ -152,14 +153,14 @@ export default function CartScreen() {
 
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal</Text>
-            <Text style={styles.summaryValue}>${subtotal.toFixed(2)}</Text>
+            <Text style={styles.summaryValue}>{formatNaira(subtotal)}</Text>
           </View>
 
           {discount > 0 && (
             <View style={styles.summaryRow}>
               <Text style={[styles.summaryLabel, { color: Colors.success }]}>Discount</Text>
               <Text style={[styles.summaryValue, { color: Colors.success }]}>
-                -${discount.toFixed(2)}
+                -{formatNaira(discount)}
               </Text>
             </View>
           )}
@@ -174,13 +175,13 @@ export default function CartScreen() {
               )}
             </View>
             <Text style={styles.summaryValue}>
-              {shippingFee === 0 ? '$0.00' : `$${shippingFee.toFixed(2)}`}
+              {shippingFee === 0 ? 'FREE' : formatNaira(shippingFee)}
             </Text>
           </View>
 
           {shippingFee > 0 && (
             <Text style={styles.shippingHint}>
-              Add ${(100 - subtotal).toFixed(2)} more for FREE shipping!
+              Add {formatNaira(100000 - subtotal)} more for FREE shipping!
             </Text>
           )}
 
@@ -188,7 +189,7 @@ export default function CartScreen() {
 
           <View style={styles.summaryRow}>
             <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>{formatNaira(total)}</Text>
           </View>
         </View>
       </ScrollView>
@@ -197,7 +198,7 @@ export default function CartScreen() {
       <View style={[styles.bottomBar, Shadows.lg]}>
         <View>
           <Text style={styles.barTotalLabel}>Estimated Total</Text>
-          <Text style={styles.barTotalAmount}>${total.toFixed(2)}</Text>
+          <Text style={styles.barTotalAmount}>{formatNaira(total)}</Text>
         </View>
 
         <TouchableOpacity

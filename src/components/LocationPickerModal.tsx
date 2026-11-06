@@ -14,7 +14,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, BorderRadius, Shadows } from '../constants/theme';
 import { useLocation } from '../context/LocationContext';
 import { UserLocation } from '../types';
-import { openGoogleMaps, openGoogleMapsSearch } from '../utils/location';
 
 interface LocationPickerModalProps {
   visible: boolean;
@@ -54,25 +53,12 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
   const handleApplyCustom = () => {
     if (!customInput.trim()) {
-      Alert.alert('Invalid Address', 'Please enter a city or address.');
+      Alert.alert('Invalid Address', 'Please enter a city or area in Nigeria.');
       return;
     }
     setCustomAddress(customInput.trim(), customInput.trim());
     setCustomInput('');
     onClose();
-  };
-
-  const handleOpenGoogleMaps = () => {
-    openGoogleMaps(
-      currentLocation.latitude,
-      currentLocation.longitude,
-      currentLocation.formattedAddress
-    );
-  };
-
-  const handleSearchGoogleMaps = () => {
-    const query = customInput.trim() || currentLocation.formattedAddress;
-    openGoogleMapsSearch(query);
   };
 
   return (
@@ -87,9 +73,9 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>Choose Delivery Location</Text>
+              <Text style={styles.title}>Delivery Area</Text>
               <Text style={styles.subtitle}>
-                Items and stores will sort according to proximity
+                Select your area or state in Nigeria
               </Text>
             </View>
             <TouchableOpacity
@@ -123,36 +109,15 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
               <View style={styles.gpsContent}>
                 <Text style={styles.gpsTitle}>Use Current Location (GPS)</Text>
                 <Text style={styles.gpsSubtitle}>
-                  Accurately detect your device position & calculate store distances
+                  Auto-detect your current state and city in Nigeria
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={Colors.primary} />
             </TouchableOpacity>
 
-            {/* Google Maps Actions */}
-            <View style={styles.mapsActionRow}>
-              <TouchableOpacity
-                style={[styles.mapsBtn, Shadows.sm]}
-                onPress={handleOpenGoogleMaps}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="map" size={18} color="#EA4335" />
-                <Text style={styles.mapsBtnText}>Open in Google Maps</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.mapsBtn, Shadows.sm]}
-                onPress={handleSearchGoogleMaps}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="search" size={18} color="#4285F4" />
-                <Text style={styles.mapsBtnText}>Search Area Maps</Text>
-              </TouchableOpacity>
-            </View>
-
             {/* Custom Address Input */}
             <View style={styles.inputSection}>
-              <Text style={styles.sectionLabel}>ENTER ADDRESS OR CITY</Text>
+              <Text style={styles.sectionLabel}>ENTER AREA OR CITY</Text>
               <View style={styles.inputRow}>
                 <Ionicons
                   name="location-outline"
@@ -162,7 +127,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                 />
                 <TextInput
                   style={styles.input}
-                  placeholder="e.g. Austin, TX or 500 Market St"
+                  placeholder="e.g. Surulere, Lagos or Garki, Abuja"
                   placeholderTextColor={Colors.light.textMuted}
                   value={customInput}
                   onChangeText={setCustomInput}
@@ -184,7 +149,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
             {/* Preset City Hubs */}
             <View style={styles.presetsSection}>
-              <Text style={styles.sectionLabel}>POPULAR HUBS &amp; CITIES</Text>
+              <Text style={styles.sectionLabel}>POPULAR NIGERIAN HUBS &amp; CITIES</Text>
               {presetLocations.map(loc => {
                 const isSelected =
                   currentLocation.latitude === loc.latitude &&
@@ -324,28 +289,6 @@ const styles = StyleSheet.create({
     color: Colors.light.textSecondary,
     marginTop: 2,
     lineHeight: 16,
-  },
-  mapsActionRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  mapsBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: BorderRadius.md,
-    gap: 6,
-  },
-  mapsBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: Colors.light.text,
   },
   inputSection: {
     gap: 6,

@@ -15,6 +15,7 @@ import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useWallet } from '@/src/context/WalletContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { PaystackModal, PaystackSuccessResponse } from '@/src/components/PaystackModal';
+import { formatNaira } from '@/src/utils/currency';
 import { WalletTransaction } from '@/src/types';
 
 export default function WalletScreen() {
@@ -50,7 +51,7 @@ export default function WalletScreen() {
   const handleProceedToPaystack = () => {
     const num = parseFloat(topUpAmount);
     if (isNaN(num) || num <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid deposit amount (e.g. $20.00).');
+      Alert.alert('Invalid Amount', 'Please enter a valid deposit amount (e.g. ₦10,000).');
       return;
     }
     setFundingAmountNumber(num);
@@ -65,7 +66,7 @@ export default function WalletScreen() {
 
     Alert.alert(
       'Wallet Funded! 💳',
-      `Successfully added $${res.amount.toFixed(2)} to your ShopPulse Wallet via Paystack.\n\nTransaction Ref: ${res.reference}`,
+      `Successfully added ${formatNaira(res.amount)} to your ShopPulse Wallet via Paystack.\n\nTransaction Ref: ${res.reference}`,
       [{ text: 'Great!' }]
     );
   };
@@ -95,7 +96,7 @@ export default function WalletScreen() {
           <Text style={styles.balanceLabel}>AVAILABLE WALLET BALANCE</Text>
           <View style={styles.balanceValueRow}>
             <Text style={styles.balanceAmount}>
-              {hideBalance ? '••••••' : `${currency}${balance.toFixed(2)}`}
+              {hideBalance ? '••••••' : formatNaira(balance)}
             </Text>
             <TouchableOpacity
               onPress={() => setHideBalance(!hideBalance)}
@@ -126,7 +127,7 @@ export default function WalletScreen() {
       <View style={styles.actionsBar}>
         <TouchableOpacity
           style={[styles.fundActionBtn, Shadows.md]}
-          onPress={() => handleOpenFundModal(50)}
+          onPress={() => handleOpenFundModal(10000)}
           activeOpacity={0.85}
         >
           <View style={styles.fundIconCircle}>
@@ -144,14 +145,14 @@ export default function WalletScreen() {
       <View style={styles.quickTopUpSection}>
         <Text style={styles.sectionSubtitle}>QUICK TOP-UP AMOUNTS</Text>
         <View style={styles.chipsRow}>
-          {[20, 50, 100, 250].map(amt => (
+          {[5000, 10000, 25000, 50000].map(amt => (
             <TouchableOpacity
               key={amt}
               style={[styles.quickChip, Shadows.sm]}
               onPress={() => handleOpenFundModal(amt)}
               activeOpacity={0.7}
             >
-              <Text style={styles.quickChipText}>+{currency}{amt}</Text>
+              <Text style={styles.quickChipText}>+{formatNaira(amt)}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -268,8 +269,7 @@ export default function WalletScreen() {
                   ]}
                 >
                   {tx.type === 'credit' ? '+' : '-'}
-                  {currency}
-                  {tx.amount.toFixed(2)}
+                  {formatNaira(tx.amount)}
                 </Text>
                 <View style={styles.txStatusPill}>
                   <Ionicons name="checkmark-circle" size={10} color="#10B981" />
@@ -311,7 +311,7 @@ export default function WalletScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.inputLabel}>ENTER AMOUNT TO DEPOSIT ($)</Text>
+            <Text style={styles.inputLabel}>ENTER AMOUNT TO DEPOSIT (₦)</Text>
             <View style={styles.amountInputWrapper}>
               <Text style={styles.currencyPrefix}>{currency}</Text>
               <TextInput
@@ -319,13 +319,13 @@ export default function WalletScreen() {
                 value={topUpAmount}
                 onChangeText={setTopUpAmount}
                 keyboardType="numeric"
-                placeholder="50.00"
+                placeholder="10000"
                 autoFocus
               />
             </View>
 
             <View style={styles.fundModalChips}>
-              {[25, 50, 100, 200].map(amt => (
+              {[5000, 10000, 25000, 50000].map(amt => (
                 <TouchableOpacity
                   key={amt}
                   style={[
@@ -340,7 +340,7 @@ export default function WalletScreen() {
                       topUpAmount === amt.toString() && styles.fundModalChipTextActive,
                     ]}
                   >
-                    +${amt}
+                    +{formatNaira(amt)}
                   </Text>
                 </TouchableOpacity>
               ))}
@@ -360,8 +360,7 @@ export default function WalletScreen() {
             >
               <Ionicons name="flash" size={18} color="#FFFFFF" />
               <Text style={styles.continueToPaystackText}>
-                Pay with Paystack ({currency}
-                {parseFloat(topUpAmount || '0').toFixed(2)})
+                Pay with Paystack ({formatNaira(parseFloat(topUpAmount || '0'))})
               </Text>
             </TouchableOpacity>
           </TouchableOpacity>

@@ -78,40 +78,19 @@ export default function ShopHomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Top Location Bar */}
+        {/* Top Location Indicator */}
         <View style={styles.topLocationBar}>
           <TouchableOpacity
-            style={styles.locationSelector}
+            style={styles.locationIndicator}
             onPress={() => setLocationModalVisible(true)}
             activeOpacity={0.7}
           >
-            <View style={styles.locationPinCircle}>
-              <Ionicons name="location" size={16} color={Colors.primary} />
-            </View>
-            <View style={styles.locationInfo}>
-              <View style={styles.locationLabelRow}>
-                <Text style={styles.locationLabel}>DELIVER TO</Text>
-                <Ionicons name="chevron-down" size={12} color={Colors.primary} />
-              </View>
-              <Text style={styles.locationAddress} numberOfLines={1}>
-                {currentLocation.name || currentLocation.city}
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.mapsShortcutBtn}
-            onPress={() =>
-              openGoogleMaps(
-                currentLocation.latitude,
-                currentLocation.longitude,
-                currentLocation.formattedAddress
-              )
-            }
-            activeOpacity={0.7}
-          >
-            <Ionicons name="map" size={15} color="#EA4335" />
-            <Text style={styles.mapsShortcutText}>Maps</Text>
+            <Ionicons name="location-sharp" size={15} color={Colors.primary} />
+            <Text style={styles.deliverToLabel}>Deliver to:</Text>
+            <Text style={styles.selectedAreaText} numberOfLines={1}>
+              {currentLocation.city || currentLocation.name}
+            </Text>
+            <Ionicons name="chevron-down" size={13} color={Colors.light.textSecondary} />
           </TouchableOpacity>
         </View>
 
@@ -149,35 +128,6 @@ export default function ShopHomeScreen() {
           onClear={() => setSearchQuery('')}
           onFilterPress={() => router.push('/(tabs)/explore')}
         />
-
-        {/* Proximity / Distance Sort Bar */}
-        <View style={styles.proximityRow}>
-          <View style={styles.proximityBadge}>
-            <Ionicons name="compass-outline" size={15} color={Colors.primary} />
-            <Text style={styles.proximityText} numberOfLines={1}>
-              Stores near <Text style={{ fontWeight: '700' }}>{currentLocation.city}</Text>
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={[styles.sortPill, sortByDistance && styles.sortPillActive]}
-            onPress={() => setSortByDistance(!sortByDistance)}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name="swap-vertical"
-              size={12}
-              color={sortByDistance ? '#FFFFFF' : Colors.light.textSecondary}
-            />
-            <Text
-              style={[
-                styles.sortPillText,
-                sortByDistance && styles.sortPillTextActive,
-              ]}
-            >
-              {sortByDistance ? 'Nearest First 📍' : 'Standard'}
-            </Text>
-          </TouchableOpacity>
-        </View>
 
         {/* Hero Promo Banner */}
         <View style={[styles.banner, Shadows.md]}>
@@ -241,8 +191,6 @@ export default function ShopHomeScreen() {
             <Text style={styles.sectionTitle}>
               {searchQuery
                 ? `Search Results (${products.length})`
-                : sortByDistance
-                ? 'Nearby Products (By Proximity)'
                 : 'All Products'}
             </Text>
           </View>
@@ -288,107 +236,26 @@ const styles = StyleSheet.create({
   topLocationBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: BorderRadius.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
+    marginBottom: Spacing.xs,
+    paddingVertical: 2,
   },
-  locationSelector: {
+  locationIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    marginRight: 8,
+    gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
   },
-  locationPinCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#EFF6FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 8,
-  },
-  locationInfo: {
-    flex: 1,
-  },
-  locationLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  locationLabel: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: Colors.primary,
-    letterSpacing: 0.5,
-  },
-  locationAddress: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.light.text,
-    marginTop: 1,
-  },
-  mapsShortcutBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF1F2',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: BorderRadius.full,
-    gap: 4,
-  },
-  mapsShortcutText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#E11D48',
-  },
-  proximityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: Spacing.md,
-  },
-  proximityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F1F5F9',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: BorderRadius.full,
-    gap: 5,
-    flex: 1,
-    marginRight: 8,
-  },
-  proximityText: {
+  deliverToLabel: {
     fontSize: 12,
     color: Colors.light.textSecondary,
+    fontWeight: '400',
   },
-  sortPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: BorderRadius.full,
-    gap: 4,
-  },
-  sortPillActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  sortPillText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.light.textSecondary,
-  },
-  sortPillTextActive: {
-    color: '#FFFFFF',
+  selectedAreaText: {
+    fontSize: 13,
+    color: Colors.light.text,
+    fontWeight: '600',
+    maxWidth: 240,
   },
   header: {
     flexDirection: 'row',
