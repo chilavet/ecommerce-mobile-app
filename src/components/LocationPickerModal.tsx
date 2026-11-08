@@ -13,7 +13,6 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, BorderRadius, Shadows } from '../constants/theme';
 import { useLocation } from '../context/LocationContext';
-import { UserLocation } from '../types';
 
 interface LocationPickerModalProps {
   visible: boolean;
@@ -26,9 +25,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 }) => {
   const {
     currentLocation,
-    presetLocations,
     loadingLocation,
-    setLocation,
     setCustomAddress,
     requestDeviceLocation,
   } = useLocation();
@@ -44,11 +41,6 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
     } else {
       Alert.alert('Location Permission', res.message);
     }
-  };
-
-  const handleSelectPreset = (loc: UserLocation) => {
-    setLocation(loc);
-    onClose();
   };
 
   const handleApplyCustom = () => {
@@ -92,6 +84,20 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
+            {/* Current Selected Delivery Area */}
+            <View style={styles.currentAreaCard}>
+              <View style={styles.currentAreaIconCircle}>
+                <Ionicons name="location" size={18} color={Colors.primary} />
+              </View>
+              <View style={styles.currentAreaContent}>
+                <Text style={styles.currentAreaLabel}>SELECTED AREA</Text>
+                <Text style={styles.currentAreaText} numberOfLines={1}>
+                  {currentLocation.formattedAddress || currentLocation.name}
+                </Text>
+              </View>
+              <Ionicons name="checkmark-circle" size={20} color="#16A34A" />
+            </View>
+
             {/* GPS Auto-detect Button */}
             <TouchableOpacity
               style={[styles.gpsCard, Shadows.sm]}
@@ -146,67 +152,6 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                 </TouchableOpacity>
               </View>
             </View>
-
-            {/* Preset City Hubs */}
-            <View style={styles.presetsSection}>
-              <Text style={styles.sectionLabel}>POPULAR NIGERIAN HUBS &amp; CITIES</Text>
-              {presetLocations.map(loc => {
-                const isSelected =
-                  currentLocation.latitude === loc.latitude &&
-                  currentLocation.longitude === loc.longitude;
-
-                return (
-                  <TouchableOpacity
-                    key={loc.id || loc.formattedAddress}
-                    style={[
-                      styles.presetCard,
-                      isSelected && styles.presetCardSelected,
-                    ]}
-                    onPress={() => handleSelectPreset(loc)}
-                    activeOpacity={0.7}
-                  >
-                    <View
-                      style={[
-                        styles.presetIconCircle,
-                        isSelected && styles.presetIconCircleSelected,
-                      ]}
-                    >
-                      <Ionicons
-                        name="business"
-                        size={18}
-                        color={isSelected ? '#FFFFFF' : Colors.light.textSecondary}
-                      />
-                    </View>
-                    <View style={styles.presetContent}>
-                      <Text
-                        style={[
-                          styles.presetName,
-                          isSelected && styles.presetNameSelected,
-                        ]}
-                      >
-                        {loc.name}
-                      </Text>
-                      <Text style={styles.presetAddress} numberOfLines={1}>
-                        {loc.formattedAddress}
-                      </Text>
-                    </View>
-                    {isSelected ? (
-                      <Ionicons
-                        name="checkmark-circle"
-                        size={22}
-                        color={Colors.primary}
-                      />
-                    ) : (
-                      <Ionicons
-                        name="chevron-forward"
-                        size={16}
-                        color={Colors.light.textMuted}
-                      />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
           </ScrollView>
         </View>
       </View>
@@ -256,6 +201,40 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: Spacing.md,
     gap: 16,
+  },
+  currentAreaCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F0FDF4',
+    padding: 14,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    borderColor: '#BBF7D0',
+  },
+  currentAreaIconCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#DCFCE7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  currentAreaContent: {
+    flex: 1,
+    marginRight: 8,
+  },
+  currentAreaLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#15803D',
+    letterSpacing: 0.6,
+  },
+  currentAreaText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.light.text,
+    marginTop: 2,
   },
   gpsCard: {
     flexDirection: 'row',
@@ -331,52 +310,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '700',
-  },
-  presetsSection: {
-    gap: 8,
-  },
-  presetCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 12,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-  },
-  presetCardSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: '#F8FAFF',
-  },
-  presetIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: Colors.light.inputBg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  presetIconCircleSelected: {
-    backgroundColor: Colors.primary,
-  },
-  presetContent: {
-    flex: 1,
-    marginRight: 8,
-  },
-  presetName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.light.text,
-  },
-  presetNameSelected: {
-    fontWeight: '800',
-    color: Colors.primary,
-  },
-  presetAddress: {
-    fontSize: 12,
-    color: Colors.light.textSecondary,
-    marginTop: 2,
   },
 });
 
