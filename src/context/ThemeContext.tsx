@@ -55,7 +55,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [systemScheme, setSystemScheme] = useState<'light' | 'dark'>(
     nativeScheme === 'dark' ? 'dark' : 'light'
   );
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
+  const [themeMode, setThemeModeState] = useState<ThemeMode>('light');
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Sync with device appearance changes in real time
@@ -79,8 +79,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     async function loadThemePreference() {
       try {
         const saved = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-        if (saved === 'light' || saved === 'dark' || saved === 'system') {
-          setThemeModeState(saved);
+        if (saved === 'dark') {
+          setThemeModeState('dark');
+        } else {
+          setThemeModeState('light');
         }
       } catch (err) {
         console.error('Failed to load theme preference:', err);
@@ -104,15 +106,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (follow) {
       await setThemeMode('system');
     } else {
-      // Lock into current effective appearance
-      const effectiveDark = themeMode === 'system' ? systemScheme === 'dark' : themeMode === 'dark';
-      await setThemeMode(effectiveDark ? 'dark' : 'light');
+      await setThemeMode(themeMode === 'dark' ? 'dark' : 'light');
     }
   };
 
   const toggleTheme = async () => {
-    const effectiveDark = themeMode === 'system' ? systemScheme === 'dark' : themeMode === 'dark';
-    await setThemeMode(effectiveDark ? 'light' : 'dark');
+    await setThemeMode(themeMode === 'dark' ? 'light' : 'dark');
   };
 
   const isDark = useMemo(() => {
@@ -181,3 +180,4 @@ export const useTheme = (): ThemeContextType => {
   }
   return context;
 };
+

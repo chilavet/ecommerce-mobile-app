@@ -131,38 +131,15 @@ export default function SettingsScreen() {
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={[styles.cardTitle, { color: colors.text }]}>Appearance &amp; Theme</Text>
               <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
-                {followSystem
-                  ? `Following phone settings (${isDark ? 'Dark Mode' : 'Light Mode'})`
-                  : isDark
-                  ? 'Dark Mode is active'
-                  : 'Light Mode is active'}
+                {isDark ? 'Dark Mode is active' : 'Light Mode is active'}
               </Text>
             </View>
           </View>
 
           <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
-          {/* Follow Phone Settings Button / Switch Row */}
-          <View style={[styles.followSystemRow, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
-            <View style={[styles.followSystemIconBox, { backgroundColor: colors.card }]}>
-              <Ionicons name="phone-portrait-outline" size={20} color={colors.primary} />
-            </View>
-            <View style={{ flex: 1, marginRight: 12 }}>
-              <Text style={[styles.followSystemTitle, { color: colors.text }]}>Follow Phone Settings</Text>
-              <Text style={[styles.followSystemSubtitle, { color: colors.textSecondary }]}>
-                Match device light or dark mode automatically
-              </Text>
-            </View>
-            <Switch
-              value={followSystem}
-              onValueChange={(val) => setFollowSystem(val)}
-              trackColor={{ false: '#94A3B8', true: colors.primary }}
-              thumbColor="#FFFFFF"
-            />
-          </View>
-
-          {/* 3 Theme Choice Buttons */}
-          <Text style={[styles.inputLabel, { color: colors.textSecondary, marginTop: 14, marginBottom: 8 }]}>
+          {/* Theme Choice Buttons */}
+          <Text style={[styles.inputLabel, { color: colors.textSecondary, marginTop: 4, marginBottom: 8 }]}>
             THEME MODE
           </Text>
           <View style={styles.themeOptionsRow}>
@@ -171,7 +148,7 @@ export default function SettingsScreen() {
               style={[
                 styles.themeBtn,
                 { backgroundColor: colors.subCard, borderColor: colors.border },
-                !followSystem && themeMode === 'light' && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
+                themeMode === 'light' && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
               ]}
               onPress={() => setThemeMode('light')}
               activeOpacity={0.7}
@@ -179,13 +156,13 @@ export default function SettingsScreen() {
               <Ionicons
                 name="sunny"
                 size={20}
-                color={!followSystem && themeMode === 'light' ? colors.primary : colors.textSecondary}
+                color={themeMode === 'light' ? colors.primary : colors.textSecondary}
               />
               <Text
                 style={[
                   styles.themeBtnText,
                   { color: colors.textSecondary },
-                  !followSystem && themeMode === 'light' && { color: colors.primary, fontWeight: '700' },
+                  themeMode === 'light' && { color: colors.primary, fontWeight: '700' },
                 ]}
               >
                 Light
@@ -197,7 +174,7 @@ export default function SettingsScreen() {
               style={[
                 styles.themeBtn,
                 { backgroundColor: colors.subCard, borderColor: colors.border },
-                !followSystem && themeMode === 'dark' && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
+                themeMode === 'dark' && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
               ]}
               onPress={() => setThemeMode('dark')}
               activeOpacity={0.7}
@@ -205,42 +182,16 @@ export default function SettingsScreen() {
               <Ionicons
                 name="moon"
                 size={20}
-                color={!followSystem && themeMode === 'dark' ? colors.primary : colors.textSecondary}
+                color={themeMode === 'dark' ? colors.primary : colors.textSecondary}
               />
               <Text
                 style={[
                   styles.themeBtnText,
                   { color: colors.textSecondary },
-                  !followSystem && themeMode === 'dark' && { color: colors.primary, fontWeight: '700' },
+                  themeMode === 'dark' && { color: colors.primary, fontWeight: '700' },
                 ]}
               >
                 Dark
-              </Text>
-            </TouchableOpacity>
-
-            {/* System / Follow Phone Settings Button */}
-            <TouchableOpacity
-              style={[
-                styles.themeBtn,
-                { backgroundColor: colors.subCard, borderColor: colors.border },
-                followSystem && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
-              ]}
-              onPress={() => setThemeMode('system')}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="phone-portrait"
-                size={20}
-                color={followSystem ? colors.primary : colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.themeBtnText,
-                  { color: colors.textSecondary },
-                  followSystem && { color: colors.primary, fontWeight: '700' },
-                ]}
-              >
-                System
               </Text>
             </TouchableOpacity>
           </View>
@@ -248,16 +199,12 @@ export default function SettingsScreen() {
           {/* Quick Info Badge */}
           <View style={[styles.themeStatusBadge, { backgroundColor: colors.badge }]}>
             <Ionicons
-              name={followSystem ? 'sync-outline' : isDark ? 'moon-outline' : 'sunny-outline'}
+              name={isDark ? 'moon-outline' : 'sunny-outline'}
               size={14}
               color={colors.primary}
             />
             <Text style={[styles.themeStatusText, { color: colors.textSecondary }]}>
-              {followSystem
-                ? `Following device settings (Phone currently: ${systemColorScheme === 'dark' ? 'Dark Mode' : 'Light Mode'})`
-                : themeMode === 'dark'
-                ? 'Dark Mode locked'
-                : 'Light Mode locked'}
+              {themeMode === 'dark' ? 'Dark Mode active 🌙' : 'Light Mode active ☀️'}
             </Text>
           </View>
         </View>

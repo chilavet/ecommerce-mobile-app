@@ -497,18 +497,9 @@ export default function ProfileScreen() {
             />
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={[styles.menuLabel, { color: colors.text }]}>Appearance &amp; Theme</Text>
-              {followSystem && (
-                <View style={[styles.themeFollowBadge, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
-                  <Text style={[styles.themeFollowBadgeText, { color: Colors.primary }]}>AUTO</Text>
-                </View>
-              )}
-            </View>
+            <Text style={[styles.menuLabel, { color: colors.text }]}>Appearance &amp; Theme</Text>
             <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
-              {followSystem
-                ? `Follow Phone (${isDark ? 'Dark' : 'Light'})`
-                : (isDark ? 'Dark Mode' : 'Light Mode')}
+              {isDark ? 'Dark Mode' : 'Light Mode'}
             </Text>
           </View>
           <Switch
@@ -518,26 +509,6 @@ export default function ProfileScreen() {
             thumbColor="#FFFFFF"
           />
         </TouchableOpacity>
-
-        {/* Personal Details / Profile Info */}
-        {user && (
-          <TouchableOpacity
-            style={[styles.menuRow, { borderBottomColor: colors.divider }]}
-            onPress={handleOpenEditProfile}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
-              <Ionicons name="person-outline" size={20} color={Colors.primary} />
-            </View>
-            <View style={{ flex: 1, marginRight: 8 }}>
-              <Text style={[styles.menuLabel, { color: colors.text }]}>Personal Details</Text>
-              <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
-                Manage contact &amp; delivery info
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
-          </TouchableOpacity>
-        )}
 
         {/* Security & Password -> single source of truth for passwords */}
         <TouchableOpacity
@@ -723,7 +694,7 @@ export default function ProfileScreen() {
               <View>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>Appearance &amp; Theme</Text>
                 <Text style={[styles.modalSubTitle, { color: colors.textSecondary }]}>
-                  Light, dark, and follow phone settings
+                  Choose light or dark appearance
                 </Text>
               </View>
               <TouchableOpacity
@@ -735,37 +706,8 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Follow Phone Settings Toggle Card */}
-            <View
-              style={[
-                styles.themeOptionCard,
-                {
-                  backgroundColor: colors.subCard,
-                  borderColor: followSystem ? Colors.primary : colors.border,
-                },
-              ]}
-            >
-              <View style={{ flex: 1, marginRight: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                  <Ionicons name="phone-portrait-outline" size={20} color={Colors.primary} />
-                  <Text style={[styles.themeOptionTitle, { color: colors.text }]}>
-                    Follow Phone Settings
-                  </Text>
-                </View>
-                <Text style={[styles.themeOptionDesc, { color: colors.textSecondary }]}>
-                  Automatically match your device's light or dark mode when your phone changes.
-                </Text>
-              </View>
-              <Switch
-                value={followSystem}
-                onValueChange={(val) => setFollowSystem(val)}
-                trackColor={{ false: '#CBD5E1', true: Colors.primary }}
-                thumbColor="#FFFFFF"
-              />
-            </View>
-
             {/* Mode Selector Buttons */}
-            <Text style={[styles.presetSectionTitle, { color: colors.textMuted }]}>
+            <Text style={[styles.presetSectionTitle, { color: colors.textMuted, marginTop: 4 }]}>
               SELECT PREFERRED MODE
             </Text>
             <View style={styles.themeButtonsRow}>
@@ -781,7 +723,7 @@ export default function ProfileScreen() {
               >
                 <Ionicons
                   name="sunny"
-                  size={20}
+                  size={22}
                   color={themeMode === 'light' ? Colors.primary : colors.textSecondary}
                 />
                 <Text
@@ -791,7 +733,7 @@ export default function ProfileScreen() {
                     themeMode === 'light' && { color: Colors.primary, fontWeight: '800' },
                   ]}
                 >
-                  Light
+                  Light Mode
                 </Text>
                 {themeMode === 'light' && (
                   <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
@@ -810,7 +752,7 @@ export default function ProfileScreen() {
               >
                 <Ionicons
                   name="moon"
-                  size={20}
+                  size={22}
                   color={themeMode === 'dark' ? Colors.primary : colors.textSecondary}
                 />
                 <Text
@@ -820,38 +762,9 @@ export default function ProfileScreen() {
                     themeMode === 'dark' && { color: Colors.primary, fontWeight: '800' },
                   ]}
                 >
-                  Dark
+                  Dark Mode
                 </Text>
                 {themeMode === 'dark' && (
-                  <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
-                )}
-              </TouchableOpacity>
-
-              {/* System Option */}
-              <TouchableOpacity
-                style={[
-                  styles.themeModeBtn,
-                  { backgroundColor: colors.subCard, borderColor: colors.border },
-                  themeMode === 'system' && { borderColor: Colors.primary, backgroundColor: isDark ? '#1E293B' : '#EFF6FF' },
-                ]}
-                onPress={() => setThemeMode('system')}
-                activeOpacity={0.8}
-              >
-                <Ionicons
-                  name="phone-portrait"
-                  size={20}
-                  color={themeMode === 'system' ? Colors.primary : colors.textSecondary}
-                />
-                <Text
-                  style={[
-                    styles.themeModeBtnText,
-                    { color: colors.text },
-                    themeMode === 'system' && { color: Colors.primary, fontWeight: '800' },
-                  ]}
-                >
-                  System
-                </Text>
-                {themeMode === 'system' && (
                   <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
                 )}
               </TouchableOpacity>
@@ -869,7 +782,6 @@ export default function ProfileScreen() {
                 <Text style={{ fontWeight: '800', color: colors.text }}>
                   {isDark ? 'Dark Mode 🌙' : 'Light Mode ☀️'}
                 </Text>
-                {followSystem && ' (Synced with device)'}
               </Text>
             </View>
 
