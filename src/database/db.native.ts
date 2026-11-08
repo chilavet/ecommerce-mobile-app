@@ -23,6 +23,7 @@ const memoryStore: InMemoryStore = {
       name: 'Alex Johnson',
       phone: '+234 803 123 4567',
       password: 'password123',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80',
       createdAt: new Date().toISOString(),
     }
   ],
@@ -427,6 +428,45 @@ export async function createUser(data: {
     phone: newUser.phone,
     createdAt: newUser.createdAt,
   };
+}
+
+export async function updateUserProfile(
+  userId: string,
+  data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    avatarUrl?: string;
+  }
+): Promise<{ success: boolean; user?: User; error?: string }> {
+  const memUser = memoryStore.users.find(u => u.id === userId);
+  if (!memUser) {
+    return { success: false, error: 'User account not found.' };
+  }
+
+  if (data.name !== undefined) memUser.name = data.name;
+  if (data.email !== undefined) memUser.email = data.email;
+  if (data.phone !== undefined) memUser.phone = data.phone;
+  if (data.avatarUrl !== undefined) memUser.avatarUrl = data.avatarUrl;
+
+  if (!useFallback && dbInstance) {
+    try {
+      if (data.name) dbInstance.runSync('UPDATE users SET name = ? WHERE id = ?', [data.name, userId]);
+      if (data.email) dbInstance.runSync('UPDATE users SET email = ? WHERE id = ?', [data.email, userId]);
+      if (data.phone) dbInstance.runSync('UPDATE users SET phone = ? WHERE id = ?', [data.phone, userId]);
+    } catch {}
+  }
+
+  const updatedUser: User = {
+    id: memUser.id,
+    email: memUser.email,
+    name: memUser.name,
+    phone: memUser.phone,
+    avatarUrl: memUser.avatarUrl,
+    createdAt: memUser.createdAt,
+  };
+
+  return { success: true, user: updatedUser };
 }
 
 export async function updateUserPassword(

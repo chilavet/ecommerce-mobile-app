@@ -5,6 +5,7 @@ import {
   createUser,
   initDatabase,
   updateUserPassword,
+  updateUserProfile,
   deleteUser,
 } from '../database/db';
 
@@ -15,6 +16,12 @@ interface AuthContextType {
   setBiometricsEnabled: (enabled: boolean) => void;
   login: (email: string, pass: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, pass: string, phone?: string) => Promise<{ success: boolean; error?: string }>;
+  updateProfile: (data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    avatarUrl?: string;
+  }) => Promise<{ success: boolean; error?: string }>;
   changePassword: (oldPass: string, newPass: string) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -56,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: found.email,
         name: found.name,
         phone: found.phone,
+        avatarUrl: found.avatarUrl,
         createdAt: found.createdAt,
       };
       setUser(loggedUser);
@@ -81,6 +89,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: true };
     } catch {
       return { success: false, error: 'Failed to create account.' };
+    }
+  };
+
+  const updateProfile = async (data: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    avatarUrl?: string;
+  }) => {
+    if (!user) {
+      return { success: false, error: 'You must be signed in to update your profile.' };
+    }
+    try {
+      const res = await updateUserProfile(user.id, data);
+      if (res.success && res.user) {
+        setUser(res.user);
+      }
+      return res;
+    } catch {
+      return { success: false, error: 'Failed to update profile.' };
     }
   };
 
@@ -116,6 +144,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setBiometricsEnabled,
         login,
         register,
+        updateProfile,
         changePassword,
         deleteAccount,
         logout,
