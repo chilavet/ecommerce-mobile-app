@@ -173,45 +173,6 @@ export default function AboutScreen() {
               </View>
             </View>
 
-            {/* Technical Specifications */}
-            <Text style={styles.sectionHeader}>TECHNICAL SPECIFICATIONS</Text>
-            <View style={[styles.specCard, Shadows.sm]}>
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>App Name</Text>
-                <Text style={styles.specValue}>ShopPulse Mobile</Text>
-              </View>
-              <View style={styles.specDivider} />
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Runtime Engine</Text>
-                <Text style={styles.specValue}>React Native 0.88 / Expo SDK 58</Text>
-              </View>
-              <View style={styles.specDivider} />
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Architecture</Text>
-                <Text style={styles.specValue}>Expo Router v4 (File-based navigation)</Text>
-              </View>
-              <View style={styles.specDivider} />
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Payment Gateway</Text>
-                <Text style={styles.specValue}>Encrypted 256-bit Card &amp; Bank Gateway</Text>
-              </View>
-              <View style={styles.specDivider} />
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Primary Currency</Text>
-                <Text style={styles.specValue}>Nigerian Naira (NGN / ₦)</Text>
-              </View>
-              <View style={styles.specDivider} />
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Database Storage</Text>
-                <Text style={styles.specValue}>Expo SQLite &amp; Local Persistence</Text>
-              </View>
-              <View style={styles.specDivider} />
-              <View style={styles.specRow}>
-                <Text style={styles.specLabel}>Corporate Registry</Text>
-                <Text style={styles.specValue}>CAC Reg. RC-7849102 (Nigeria)</Text>
-              </View>
-            </View>
-
             {/* Support CTA */}
             <View style={[styles.helpCard, Shadows.sm]}>
               <View style={{ flex: 1 }}>
@@ -548,36 +509,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: Colors.light.textSecondary,
     lineHeight: 16,
-  },
-
-  // Specifications Card
-  specCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: BorderRadius.xl,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.light.border,
-  },
-  specRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  specLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.light.textSecondary,
-  },
-  specValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: Colors.light.text,
-    textAlign: 'right',
-  },
-  specDivider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
   },
 
   // Help Card
