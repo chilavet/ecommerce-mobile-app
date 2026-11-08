@@ -19,7 +19,6 @@ import { useNotifications } from '@/src/context/NotificationContext';
 import { useWallet } from '@/src/context/WalletContext';
 import { getOrders } from '@/src/database/db';
 import { LocationPickerModal } from '@/src/components/LocationPickerModal';
-import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 import { formatNaira } from '@/src/utils/currency';
 
 export default function ProfileScreen() {
@@ -44,23 +43,6 @@ export default function ProfileScreen() {
   const [phone, setPhone] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
 
-  // Biometrics hardware state
-  const [biometrics, setBiometrics] = useState<BiometricStatus>({
-    isAvailable: false,
-    hasHardware: false,
-    isEnrolled: false,
-    biometricType: 'none',
-    biometricName: 'Biometrics',
-  });
-
-  useEffect(() => {
-    async function initBio() {
-      const status = await checkBiometrics();
-      setBiometrics(status);
-    }
-    initBio();
-  }, []);
-
   const loadUserData = useCallback(async () => {
     try {
       const userId = user ? user.id : 'usr_demo';
@@ -76,36 +58,6 @@ export default function ProfileScreen() {
       loadUserData();
     }, [loadUserData])
   );
-
-  const handleBiometricLogin = async () => {
-    const result = await authenticateWithBiometrics(
-      `Sign in with ${biometrics.biometricName}`
-    );
-
-    if (result.success) {
-      await login('alex@example.com', 'password123');
-      setAuthModalVisible(false);
-      Alert.alert('Authenticated', `Welcome back! Signed in with ${biometrics.biometricName}.`);
-    } else if (result.notEnrolled) {
-      Alert.alert(
-        `${biometrics.biometricName} Not Enrolled`,
-        'Simulate successful biometric sign-in for demonstration?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Simulate Sign In',
-            onPress: async () => {
-              await login('alex@example.com', 'password123');
-              setAuthModalVisible(false);
-              Alert.alert('Success', 'Biometric sign-in successful!');
-            },
-          },
-        ]
-      );
-    } else if (result.error) {
-      setAuthError(result.error);
-    }
-  };
 
   const handleAuthSubmit = async () => {
     setAuthError(null);
@@ -299,7 +251,7 @@ export default function ProfileScreen() {
       <View style={[styles.menuSection, Shadows.sm]}>
         <Text style={styles.sectionTitle}>App &amp; Security Settings</Text>
 
-        {/* Security & Password -> single source of truth for passwords & biometrics */}
+        {/* Security & Password -> single source of truth for passwords */}
         <TouchableOpacity
           style={styles.menuRow}
           onPress={() => router.push('/settings')}
@@ -311,7 +263,7 @@ export default function ProfileScreen() {
           <View style={{ flex: 1, marginRight: 8 }}>
             <Text style={styles.menuLabel}>Security &amp; Password</Text>
             <Text style={styles.menuSubLabel}>
-              Biometric login, change password, delete account
+              Change password, delete account
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
@@ -535,27 +487,10 @@ export default function ProfileScreen() {
             />
 
             {authMode === 'login' && (
-              <>
-                <TouchableOpacity
-                  style={styles.biometricBtn}
-                  onPress={handleBiometricLogin}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons
-                    name={biometrics.biometricType === 'facial' ? 'scan-outline' : 'finger-print'}
-                    size={20}
-                    color="#FFFFFF"
-                  />
-                  <Text style={styles.biometricBtnText}>
-                    Sign In with {biometrics.biometricName}
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity style={styles.demoFillBtn} onPress={handleFillDemo}>
-                  <Ionicons name="flash-outline" size={14} color={Colors.primary} />
-                  <Text style={styles.demoFillText}>Auto-fill Demo Account</Text>
-                </TouchableOpacity>
-              </>
+              <TouchableOpacity style={styles.demoFillBtn} onPress={handleFillDemo}>
+                <Ionicons name="flash-outline" size={14} color={Colors.primary} />
+                <Text style={styles.demoFillText}>Auto-fill Demo Account</Text>
+              </TouchableOpacity>
             )}
 
             <TouchableOpacity
@@ -944,21 +879,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: Colors.light.text,
-  },
-  biometricBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#0F172A',
-    height: 46,
-    borderRadius: BorderRadius.md,
-    marginTop: 12,
-    gap: 8,
-  },
-  biometricBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 14,
   },
   demoFillBtn: {
     flexDirection: 'row',

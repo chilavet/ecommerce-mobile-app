@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-  Switch,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -20,13 +19,12 @@ import { useNotifications } from '@/src/context/NotificationContext';
 import { useWallet } from '@/src/context/WalletContext';
 import { PaystackModal, PaystackSuccessResponse } from '@/src/components/PaystackModal';
 import { createOrder } from '@/src/database/db';
-import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 import { formatNaira } from '@/src/utils/currency';
 
 type PaymentType = 'wallet' | 'card';
 
 export default function CheckoutScreen() {
-  const { user, biometricsEnabled, setBiometricsEnabled } = useAuth();
+  const { user } = useAuth();
   const { items, subtotal, shippingFee, discount, total, clearCart } = useCart();
   const { sendOrderConfirmation } = useNotifications();
 
@@ -37,23 +35,6 @@ export default function CheckoutScreen() {
   // Digital Wallet & Paystack Gateway
   const { balance, payWithWallet, hasSufficientBalance } = useWallet();
   const [paystackVisible, setPaystackVisible] = useState(false);
-
-  // Biometric Payment Security
-  const [biometrics, setBiometrics] = useState<BiometricStatus>({
-    isAvailable: false,
-    hasHardware: false,
-    isEnrolled: false,
-    biometricType: 'none',
-    biometricName: 'Biometrics',
-  });
-
-  useEffect(() => {
-    async function initBio() {
-      const status = await checkBiometrics();
-      setBiometrics(status);
-    }
-    initBio();
-  }, []);
 
   const handlePlaceOrder = async () => {
     if (items.length === 0) {
@@ -84,32 +65,6 @@ export default function CheckoutScreen() {
             },
           ]
         );
-        return;
-      }
-    }
-
-    if (biometricsEnabled) {
-      const bioAuth = await authenticateWithBiometrics(
-        `Confirm payment of ${formatNaira(total)} with ${biometrics.biometricName}`
-      );
-
-      if (bioAuth.notEnrolled) {
-        Alert.alert(
-          `${biometrics.biometricName} Setup`,
-          `No biometric credential is set up on this device yet. Would you like to authorize this payment via simulated ${biometrics.biometricName}?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            {
-              text: 'Authorize & Place Order',
-              onPress: () => processOrderPlacement(),
-            },
-          ]
-        );
-        return;
-      }
-
-      if (!bioAuth.success) {
-        Alert.alert('Biometric Verification', bioAuth.error || 'Authentication failed. Please try again.');
         return;
       }
     }
@@ -259,31 +214,6 @@ export default function CheckoutScreen() {
               <Text style={[styles.secureText, { color: '#0BA4DB' }]}>Secured</Text>
             </View>
           </TouchableOpacity>
-        </View>
-
-        {/* Biometric Authorization */}
-        <View style={[styles.card, Shadows.sm]}>
-          <View style={styles.biometricRow}>
-            <View style={styles.biometricIconWrapper}>
-              <Ionicons
-                name={biometrics.biometricType === 'facial' ? 'scan-outline' : 'finger-print'}
-                size={22}
-                color={Colors.primary}
-              />
-            </View>
-            <View style={{ flex: 1, marginHorizontal: 10 }}>
-              <Text style={styles.biometricTitle}>{biometrics.biometricName} Security</Text>
-              <Text style={styles.biometricSubtitle}>
-                Require biometric verification to approve this transaction
-              </Text>
-            </View>
-            <Switch
-              value={biometricsEnabled}
-              onValueChange={setBiometricsEnabled}
-              trackColor={{ false: '#CBD5E1', true: Colors.primaryLight }}
-              thumbColor={biometricsEnabled ? Colors.primary : '#F8FAFC'}
-            />
-          </View>
         </View>
 
         {/* Order Review Summary */}
@@ -493,28 +423,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
     marginLeft: 3,
-  },
-  biometricRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  biometricIconWrapper: {
-    width: 40,
-    height: 40,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  biometricTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.light.text,
-  },
-  biometricSubtitle: {
-    fontSize: 12,
-    color: Colors.light.textSecondary,
-    marginTop: 2,
   },
   summaryRow: {
     flexDirection: 'row',

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Switch,
   Alert,
   ActivityIndicator,
 } from 'react-native';
@@ -15,19 +14,9 @@ import { router, Stack } from 'expo-router';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
-import { checkBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 
 export default function SettingsScreen() {
-  const { user, biometricsEnabled, setBiometricsEnabled, changePassword, deleteAccount } = useAuth();
-
-  // Biometric status
-  const [biometrics, setBiometrics] = useState<BiometricStatus>({
-    isAvailable: false,
-    hasHardware: false,
-    isEnrolled: false,
-    biometricType: 'none',
-    biometricName: 'Biometrics',
-  });
+  const { user, changePassword, deleteAccount } = useAuth();
 
   // Password Change Form State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -40,14 +29,6 @@ export default function SettingsScreen() {
 
   // Delete Account State
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    async function loadBiometrics() {
-      const status = await checkBiometrics();
-      setBiometrics(status);
-    }
-    loadBiometrics();
-  }, []);
 
   const handleChangePassword = async () => {
     setPasswordFeedback(null);
@@ -123,63 +104,7 @@ export default function SettingsScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Section 1: Biometric Authentication Toggle */}
-        <View style={[styles.card, Shadows.sm]}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.iconCircle}>
-              <Ionicons
-                name={biometrics.biometricType === 'facial' ? 'scan-outline' : 'finger-print'}
-                size={22}
-                color={Colors.primary}
-              />
-            </View>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.cardTitle}>{biometrics.biometricName} Security</Text>
-              <Text style={styles.cardSubtitle}>
-                {biometrics.hasHardware
-                  ? `Hardware ready on this device (${biometrics.biometricName})`
-                  : 'Biometric hardware not detected'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.settingRow}>
-            <View style={{ flex: 1, marginRight: 12 }}>
-              <Text style={styles.settingLabel}>Enable {biometrics.biometricName}</Text>
-              <Text style={styles.settingDescription}>
-                Use your {biometrics.biometricName.toLowerCase()} for rapid sign-in and 1-tap checkout authorization.
-              </Text>
-            </View>
-            <Switch
-              value={biometricsEnabled}
-              onValueChange={setBiometricsEnabled}
-              trackColor={{ false: '#CBD5E1', true: Colors.primaryLight }}
-              thumbColor={biometricsEnabled ? Colors.primary : '#F8FAFC'}
-            />
-          </View>
-
-          <View style={styles.statusBadge}>
-            <Ionicons
-              name={biometricsEnabled ? 'checkmark-circle' : 'close-circle'}
-              size={14}
-              color={biometricsEnabled ? Colors.success : Colors.light.textMuted}
-            />
-            <Text
-              style={[
-                styles.statusText,
-                { color: biometricsEnabled ? Colors.success : Colors.light.textMuted },
-              ]}
-            >
-              {biometricsEnabled
-                ? `${biometrics.biometricName} function is currently ACTIVE`
-                : `${biometrics.biometricName} function is DISABLED`}
-            </Text>
-          </View>
-        </View>
-
-        {/* Section 2: Change Password */}
+        {/* Section 1: Change Password */}
         <View style={[styles.card, Shadows.sm]}>
           <View style={styles.sectionHeader}>
             <View style={[styles.iconCircle, { backgroundColor: '#FEF3C7' }]}>
@@ -371,36 +296,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#F1F5F9',
     marginVertical: 12,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-  },
-  settingLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.light.text,
-  },
-  settingDescription: {
-    fontSize: 12,
-    color: Colors.light.textSecondary,
-    marginTop: 2,
-    lineHeight: 18,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    padding: 10,
-    borderRadius: BorderRadius.md,
-    marginTop: 12,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginLeft: 6,
   },
   feedbackBox: {
     flexDirection: 'row',

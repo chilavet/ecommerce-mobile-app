@@ -17,7 +17,6 @@ import { StatusBar } from 'expo-status-bar';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
-import { checkBiometrics, authenticateWithBiometrics, BiometricStatus } from '@/src/utils/biometrics';
 
 export default function LoginScreen() {
   const { user, login, isLoading: authLoading } = useAuth();
@@ -26,21 +25,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [biometrics, setBiometrics] = useState<BiometricStatus>({
-    isAvailable: false,
-    hasHardware: false,
-    isEnrolled: false,
-    biometricType: 'none',
-    biometricName: 'Biometrics',
-  });
-
-  useEffect(() => {
-    async function initBio() {
-      const status = await checkBiometrics();
-      setBiometrics(status);
-    }
-    initBio();
-  }, []);
 
   // If already authenticated, redirect to tabs
   if (!authLoading && user) {
@@ -88,26 +72,6 @@ export default function LoginScreen() {
       }
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleBiometricLogin = async () => {
-    const authRes = await authenticateWithBiometrics(
-      `Authenticate to sign in to ShopPulse`
-    );
-
-    if (authRes.success || authRes.notEnrolled) {
-      // If biometrics passed or simulated on emulator: log in demo account
-      setIsSubmitting(true);
-      const res = await login('alex@example.com', 'password123');
-      setIsSubmitting(false);
-      if (res.success) {
-        router.replace('/(tabs)');
-      } else {
-        Alert.alert('Authentication Failed', res.error || 'Could not verify user account.');
-      }
-    } else {
-      Alert.alert('Biometric Sign In Failed', authRes.error || 'Authentication cancelled.');
     }
   };
 
@@ -213,26 +177,9 @@ export default function LoginScreen() {
 
           <View style={styles.dividerRow}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR FAST SIGN IN</Text>
+            <Text style={styles.dividerText}>QUICK DEMO</Text>
             <View style={styles.dividerLine} />
           </View>
-
-          {/* Biometrics Login */}
-          <TouchableOpacity
-            style={styles.biometricButton}
-            onPress={handleBiometricLogin}
-            disabled={isSubmitting}
-            activeOpacity={0.8}
-          >
-            <Ionicons
-              name={biometrics.biometricType === 'facial' ? 'scan' : 'finger-print'}
-              size={22}
-              color={Colors.primary}
-            />
-            <Text style={styles.biometricButtonText}>
-              Sign In with {biometrics.biometricName || 'Biometrics'}
-            </Text>
-          </TouchableOpacity>
 
           {/* 1-Tap Demo Access */}
           <TouchableOpacity
@@ -391,23 +338,6 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     marginHorizontal: 10,
     letterSpacing: 0.5,
-  },
-  biometricButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 48,
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1.5,
-    borderColor: Colors.primaryLight,
-    backgroundColor: '#EFF6FF',
-    marginBottom: 10,
-    gap: 8,
-  },
-  biometricButtonText: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: '700',
   },
   demoQuickButton: {
     flexDirection: 'row',

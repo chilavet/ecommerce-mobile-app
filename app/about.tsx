@@ -164,11 +164,11 @@ export default function AboutScreen() {
 
               <View style={[styles.featureCard, Shadows.sm]}>
                 <View style={[styles.featureIconCircle, { backgroundColor: '#FEF2F2' }]}>
-                  <Ionicons name="finger-print" size={20} color="#DC2626" />
+                  <Ionicons name="shield-checkmark" size={20} color="#DC2626" />
                 </View>
-                <Text style={styles.featureTitle}>Biometric Security</Text>
+                <Text style={styles.featureTitle}>Account Protection</Text>
                 <Text style={styles.featureDesc}>
-                  Hardware-backed biometric authentication (fingerprint and Face ID) safeguarding account access and wallets.
+                  Encrypted passwords, secure tokenized sessions, and 256-bit bank-grade SSL safeguarding account data.
                 </Text>
               </View>
             </View>
@@ -214,7 +214,7 @@ export default function AboutScreen() {
               <Text style={styles.clauseNumber}>SECTION 1</Text>
               <Text style={styles.clauseTitle}>Eligibility &amp; Account Security</Text>
               <Text style={styles.clauseBody}>
-                You must be at least 18 years of age or possess legal parental/guardian authorization to register an account with ShopPulse. You are responsible for safeguarding your credentials, passwords, and biometric access. Any activity conducted under your authenticated session shall be deemed authorized by you.
+                You must be at least 18 years of age or possess legal parental/guardian authorization to register an account with ShopPulse. You are responsible for safeguarding your credentials and passwords. Any activity conducted under your authenticated session shall be deemed authorized by you.
               </Text>
             </View>
 

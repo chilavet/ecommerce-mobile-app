@@ -78,8 +78,8 @@ const initialNotifications: AppNotification[] = [
   },
   {
     id: 'notif_3',
-    title: 'Biometric Security Ready 🔒',
-    body: 'Fingerprint authentication is ready on your device. Turn it on in Settings for 1-tap checkout.',
+    title: 'Account Security Protected 🔒',
+    body: 'Your ShopPulse account is secured with 256-bit encrypted authentication.',
     timestamp: '3h ago',
     read: false,
     type: 'security',
