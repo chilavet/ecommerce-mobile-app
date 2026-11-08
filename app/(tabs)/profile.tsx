@@ -346,13 +346,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           style={styles.menuRow}
-          onPress={() =>
-            Alert.alert(
-              'Customer Support',
-              'Need assistance with an order or product?\n\n• Email: support@shoppulse.app\n• Phone: +1 800 555 0199\n• Hours: 24/7 Available',
-              [{ text: 'Close' }]
-            )
-          }
+          onPress={() => router.push('/customer-care')}
           activeOpacity={0.7}
         >
           <View style={[styles.menuIconWrapper, { backgroundColor: '#ECFDF5' }]}>

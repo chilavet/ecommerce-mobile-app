@@ -1,5 +1,5 @@
 import { SEED_CATEGORIES, SEED_PRODUCTS } from './seedData';
-import { Product, Category, User, Order, Address, OrderStatus } from '../types';
+import { Product, Category, User, Order, Address, OrderStatus, SupportTicket } from '../types';
 import { requireOptionalNativeModule } from 'expo-modules-core';
 
 let SQLite: any = null;
@@ -12,6 +12,7 @@ interface InMemoryStore {
   products: Product[];
   orders: Order[];
   addresses: Address[];
+  supportTickets: SupportTicket[];
 }
 
 const memoryStore: InMemoryStore = {
@@ -75,6 +76,18 @@ const memoryStore: InMemoryStore = {
       country: 'Nigeria',
       phone: '+234 803 123 4567',
       isDefault: true,
+    }
+  ],
+  supportTickets: [
+    {
+      id: 'TIC-1092-NG',
+      userId: 'usr_demo',
+      category: 'Orders & Delivery',
+      orderId: 'ord_1001',
+      message: 'Package arrived safely at Lekki! Inquiring about warranty on the Sony Headphones.',
+      mediaUri: undefined,
+      status: 'resolved',
+      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     }
   ],
 };
@@ -640,4 +653,22 @@ export async function saveAddress(address: Address): Promise<Address> {
   }
 
   return address;
+}
+
+export async function createSupportTicket(
+  ticket: Omit<SupportTicket, 'id' | 'createdAt'>
+): Promise<SupportTicket> {
+  const newTicket: SupportTicket = {
+    ...ticket,
+    id: `TIC-${Math.floor(100000 + Math.random() * 900000)}-NG`,
+    createdAt: new Date().toISOString(),
+  };
+
+  memoryStore.supportTickets.unshift(newTicket);
+  return newTicket;
+}
+
+export async function getSupportTickets(userId?: string): Promise<SupportTicket[]> {
+  if (!userId) return [...memoryStore.supportTickets];
+  return memoryStore.supportTickets.filter(t => t.userId === userId);
 }

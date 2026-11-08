@@ -93,6 +93,13 @@ export default function RootLayout() {
                     }}
                   />
                   <Stack.Screen
+                    name="customer-care"
+                    options={{
+                      title: 'Customer Care & FAQs',
+                      headerBackTitle: 'Account',
+                    }}
+                  />
+                  <Stack.Screen
                     name="notifications"
                     options={{
                       title: 'Notifications',

@@ -148,3 +148,14 @@ export interface PromoCode {
   minOrder?: number;
 }
 
+export interface SupportTicket {
+  id: string;
+  userId: string;
+  category: string;
+  orderId?: string;
+  message: string;
+  mediaUri?: string;
+  status: 'submitted' | 'under_review' | 'resolved';
+  createdAt: string;
+}
+
