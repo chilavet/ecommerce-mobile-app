@@ -361,13 +361,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           style={[styles.menuRow, { borderBottomWidth: 0 }]}
-          onPress={() =>
-            Alert.alert(
-              'About ShopPulse',
-              'ShopPulse Mobile App\nVersion 1.0.0 (Build 42)\n\nBuilt with React Native, Expo SDK 58, and Local Storage.',
-              [{ text: 'OK' }]
-            )
-          }
+          onPress={() => router.push('/about')}
           activeOpacity={0.7}
         >
           <View style={[styles.menuIconWrapper, { backgroundColor: '#F1F5F9' }]}>

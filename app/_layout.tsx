@@ -100,6 +100,13 @@ export default function RootLayout() {
                     }}
                   />
                   <Stack.Screen
+                    name="about"
+                    options={{
+                      title: 'About ShopPulse',
+                      headerBackTitle: 'Account',
+                    }}
+                  />
+                  <Stack.Screen
                     name="notifications"
                     options={{
                       title: 'Notifications',
