@@ -19,15 +19,7 @@ import { useTheme } from '@/src/context/ThemeContext';
 
 export default function SettingsScreen() {
   const { user, changePassword, deleteAccount } = useAuth();
-  const {
-    themeMode,
-    setThemeMode,
-    isDark,
-    colors,
-    followSystem,
-    setFollowSystem,
-    systemColorScheme,
-  } = useTheme();
+  const { isDark, colors } = useTheme();
 
   // Password Change Form State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -118,98 +110,7 @@ export default function SettingsScreen() {
       />
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Section 1: Appearance & Theme */}
-        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
-          <View style={styles.sectionHeader}>
-            <View style={[styles.iconCircle, { backgroundColor: isDark ? '#1E293B' : '#FEF3C7' }]}>
-              <Ionicons
-                name={isDark ? 'moon' : 'sunny'}
-                size={22}
-                color={isDark ? '#818CF8' : '#D97706'}
-              />
-            </View>
-            <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={[styles.cardTitle, { color: colors.text }]}>Appearance &amp; Theme</Text>
-              <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
-                {isDark ? 'Dark Mode is active' : 'Light Mode is active'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-
-          {/* Theme Choice Buttons */}
-          <Text style={[styles.inputLabel, { color: colors.textSecondary, marginTop: 4, marginBottom: 8 }]}>
-            THEME MODE
-          </Text>
-          <View style={styles.themeOptionsRow}>
-            {/* Light Mode Button */}
-            <TouchableOpacity
-              style={[
-                styles.themeBtn,
-                { backgroundColor: colors.subCard, borderColor: colors.border },
-                themeMode === 'light' && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
-              ]}
-              onPress={() => setThemeMode('light')}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="sunny"
-                size={20}
-                color={themeMode === 'light' ? colors.primary : colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.themeBtnText,
-                  { color: colors.textSecondary },
-                  themeMode === 'light' && { color: colors.primary, fontWeight: '700' },
-                ]}
-              >
-                Light
-              </Text>
-            </TouchableOpacity>
-
-            {/* Dark Mode Button */}
-            <TouchableOpacity
-              style={[
-                styles.themeBtn,
-                { backgroundColor: colors.subCard, borderColor: colors.border },
-                themeMode === 'dark' && [styles.themeBtnActive, { borderColor: colors.primary, backgroundColor: isDark ? '#1E3A8A25' : '#EFF6FF' }],
-              ]}
-              onPress={() => setThemeMode('dark')}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="moon"
-                size={20}
-                color={themeMode === 'dark' ? colors.primary : colors.textSecondary}
-              />
-              <Text
-                style={[
-                  styles.themeBtnText,
-                  { color: colors.textSecondary },
-                  themeMode === 'dark' && { color: colors.primary, fontWeight: '700' },
-                ]}
-              >
-                Dark
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Quick Info Badge */}
-          <View style={[styles.themeStatusBadge, { backgroundColor: colors.badge }]}>
-            <Ionicons
-              name={isDark ? 'moon-outline' : 'sunny-outline'}
-              size={14}
-              color={colors.primary}
-            />
-            <Text style={[styles.themeStatusText, { color: colors.textSecondary }]}>
-              {themeMode === 'dark' ? 'Dark Mode active 🌙' : 'Light Mode active ☀️'}
-            </Text>
-          </View>
-        </View>
-
-        {/* Section 2: Change Password */}
+        {/* Section 1: Change Password */}
         <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
           <View style={styles.sectionHeader}>
             <View style={[styles.iconCircle, { backgroundColor: isDark ? '#1E293B' : '#FEF3C7' }]}>
@@ -394,63 +295,6 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginVertical: 12,
-  },
-  followSystemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-  },
-  followSystemIconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: BorderRadius.sm,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-  followSystemTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  followSystemSubtitle: {
-    fontSize: 11,
-    marginTop: 2,
-  },
-  themeOptionsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  themeBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderRadius: BorderRadius.md,
-    borderWidth: 1,
-  },
-  themeBtnActive: {
-    borderWidth: 2,
-  },
-  themeBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  themeStatusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: BorderRadius.sm,
-    marginTop: 12,
-  },
-  themeStatusText: {
-    fontSize: 11,
-    fontWeight: '500',
   },
   feedbackBox: {
     flexDirection: 'row',
