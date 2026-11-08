@@ -126,7 +126,6 @@ export default function ShopHomeScreen() {
           value={searchQuery}
           onChangeText={setSearchQuery}
           onClear={() => setSearchQuery('')}
-          onFilterPress={() => setSelectedCategoryId('cat_all')}
         />
 
         {/* Hero Promo Banner */}

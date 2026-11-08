@@ -16,7 +16,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onChangeText,
   placeholder = 'Search products, brands, tech...',
   onClear,
-  onFilterPress,
 }) => {
   return (
     <View style={styles.container}>
@@ -38,11 +37,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      {onFilterPress && (
-        <TouchableOpacity style={styles.filterButton} onPress={onFilterPress} activeOpacity={0.8}>
-          <Ionicons name="options-outline" size={20} color="#FFFFFF" />
-        </TouchableOpacity>
-      )}
     </View>
   );
 };
@@ -71,15 +65,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 15,
     color: Colors.light.text,
-  },
-  filterButton: {
-    marginLeft: 10,
-    backgroundColor: Colors.primary,
-    height: 48,
-    width: 48,
-    borderRadius: BorderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 
