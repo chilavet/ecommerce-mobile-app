@@ -364,7 +364,6 @@ export default function ProfileScreen() {
           <Text style={styles.userEmail} numberOfLines={1}>
             {user ? user.email : 'Sign in to sync orders & saved addresses'}
           </Text>
-          {user?.phone ? <Text style={styles.userPhone}>{user.phone}</Text> : null}
         </View>
 
         {user ? (
@@ -432,94 +431,6 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* 2.5 Personal Details Section ("See My Details") */}
-      {user && (
-        <View style={[styles.menuSection, Shadows.sm]}>
-          <View style={styles.detailsHeaderRow}>
-            <Text style={styles.sectionTitle}>Personal Details</Text>
-            <TouchableOpacity
-              style={styles.editPillSmall}
-              onPress={handleOpenEditProfile}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="pencil" size={12} color={Colors.primary} />
-              <Text style={styles.editPillSmallText}>Edit Info</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Full Name */}
-          <View style={styles.detailRow}>
-            <View style={[styles.detailIcon, { backgroundColor: '#EFF6FF' }]}>
-              <Ionicons name="person-outline" size={18} color={Colors.primary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.detailLabel}>Full Name</Text>
-              <Text style={styles.detailValue}>{user.name}</Text>
-            </View>
-          </View>
-
-          {/* Email Address */}
-          <View style={styles.detailRow}>
-            <View style={[styles.detailIcon, { backgroundColor: '#ECFDF5' }]}>
-              <Ionicons name="mail-outline" size={18} color="#059669" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.detailLabel}>Email Address</Text>
-              <Text style={styles.detailValue}>{user.email}</Text>
-            </View>
-            <View style={styles.primaryBadge}>
-              <Text style={styles.primaryBadgeText}>Primary</Text>
-            </View>
-          </View>
-
-          {/* Phone Number */}
-          <View style={styles.detailRow}>
-            <View style={[styles.detailIcon, { backgroundColor: '#FEF3C7' }]}>
-              <Ionicons name="call-outline" size={18} color="#D97706" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.detailLabel}>Phone Number</Text>
-              <Text style={styles.detailValue}>
-                {user.phone || 'No phone added'}
-              </Text>
-            </View>
-            {!user.phone && (
-              <TouchableOpacity onPress={handleOpenEditProfile}>
-                <Text style={styles.addPhoneText}>+ Add Phone</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          {/* Primary Delivery Address */}
-          <View style={styles.detailRow}>
-            <View style={[styles.detailIcon, { backgroundColor: '#F3E8FF' }]}>
-              <Ionicons name="home-outline" size={18} color="#9333EA" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.detailLabel}>Default Delivery Address</Text>
-              <Text style={styles.detailValue}>
-                {userAddress?.street
-                  ? `${userAddress.street}, ${userAddress.city}, ${userAddress.state}`
-                  : (currentLocation.formattedAddress || 'Lekki Phase 1, Lagos State')}
-              </Text>
-            </View>
-          </View>
-
-          {/* Account Status / Member Since */}
-          <View style={[styles.detailRow, { borderBottomWidth: 0, paddingBottom: 2 }]}>
-            <View style={[styles.detailIcon, { backgroundColor: '#F1F5F9' }]}>
-              <Ionicons name="shield-checkmark-outline" size={18} color="#475569" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.detailLabel}>Account Verification</Text>
-              <Text style={styles.detailValue}>
-                Verified Shopper • Member since {formatMemberDate(user.createdAt)}
-              </Text>
-            </View>
-          </View>
-        </View>
-      )}
-
       {/* 3. Section: Wallet & Payment */}
       <View style={[styles.menuSection, Shadows.sm]}>
         <Text style={styles.sectionTitle}>Wallet &amp; Payment</Text>
@@ -567,6 +478,26 @@ export default function ProfileScreen() {
       {/* 4. Section: Settings & Preferences */}
       <View style={[styles.menuSection, Shadows.sm]}>
         <Text style={styles.sectionTitle}>App &amp; Security Settings</Text>
+
+        {/* Personal Details / Profile Info */}
+        {user && (
+          <TouchableOpacity
+            style={styles.menuRow}
+            onPress={handleOpenEditProfile}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.menuIconWrapper, { backgroundColor: '#EFF6FF' }]}>
+              <Ionicons name="person-outline" size={20} color={Colors.primary} />
+            </View>
+            <View style={{ flex: 1, marginRight: 8 }}>
+              <Text style={styles.menuLabel}>Personal Details</Text>
+              <Text style={styles.menuSubLabel}>
+                Manage contact &amp; delivery info
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+          </TouchableOpacity>
+        )}
 
         {/* Security & Password -> single source of truth for passwords */}
         <TouchableOpacity
@@ -1074,6 +1005,15 @@ export default function ProfileScreen() {
                   </View>
                 </View>
               </View>
+              {/* Member Status note */}
+              {user && (
+                <View style={styles.modalMemberBadge}>
+                  <Ionicons name="shield-checkmark" size={16} color="#10B981" />
+                  <Text style={styles.modalMemberText}>
+                    Verified Shopper • Member since {formatMemberDate(user.createdAt)}
+                  </Text>
+                </View>
+              )}
             </ScrollView>
 
             <TouchableOpacity
@@ -1523,69 +1463,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
   },
-  detailsHeaderRow: {
+  modalMemberBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  editPillSmall: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#EFF6FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.full,
-    gap: 4,
-  },
-  editPillSmallText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F5F9',
-  },
-  detailIcon: {
-    width: 36,
-    height: 36,
+    gap: 8,
+    backgroundColor: '#F8FAFC',
     borderRadius: BorderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
   },
-  detailLabel: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: Colors.light.textMuted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  detailValue: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.light.text,
-    marginTop: 2,
-  },
-  primaryBadge: {
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: BorderRadius.sm,
-  },
-  primaryBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#059669',
-  },
-  addPhoneText: {
+  modalMemberText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: Colors.primary,
+    color: Colors.light.textSecondary,
+    fontWeight: '500',
   },
   modalSubTitle: {
     fontSize: 12,
