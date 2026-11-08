@@ -30,7 +30,7 @@ const INITIAL_TRANSACTIONS: WalletTransaction[] = [
     userId: 'usr_demo',
     type: 'credit',
     amount: 100000,
-    description: 'Wallet Top-up via Paystack',
+    description: 'Wallet Top-up (Card Deposit)',
     channel: 'paystack',
     reference: 'PSTK_PAY_894120',
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -81,7 +81,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       userId: user?.id || 'usr_demo',
       type: 'credit',
       amount,
-      description: `Wallet Top-up via ${channel === 'paystack' ? 'Paystack' : 'Transfer'}`,
+      description: `Wallet Top-up via ${channel === 'paystack' ? 'Card' : 'Transfer'}`,
       channel,
       reference,
       createdAt: new Date().toISOString(),
@@ -93,13 +93,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     // Send push notification & in-app alert
     await sendLocalPushNotification({
       title: 'Wallet Funded Successfully! 💳',
-      body: `+${formatNaira(amount)} deposited into your ShopPulse Wallet via Paystack. New balance: ${formatNaira(newBal)}.`,
+      body: `+${formatNaira(amount)} deposited into your ShopPulse Wallet. New balance: ${formatNaira(newBal)}.`,
       data: { type: 'wallet_funded', reference, amount, balance: newBal },
     });
 
     addNotification({
       title: 'Wallet Top-up Successful',
-      body: `+${formatNaira(amount)} deposited via Paystack. Balance: ${formatNaira(newBal)}.`,
+      body: `+${formatNaira(amount)} deposited successfully. Balance: ${formatNaira(newBal)}.`,
       type: 'order',
     });
 

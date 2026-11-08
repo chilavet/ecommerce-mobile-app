@@ -367,7 +367,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
               { color: order.paymentMethod === 'wallet' ? '#059669' : '#0BA4DB' },
             ]}
           >
-            {order.paymentMethod === 'wallet' ? 'Wallet Paid' : 'Card (Paystack)'}
+            {order.paymentMethod === 'wallet' ? 'Wallet Paid' : 'Card Payment'}
           </Text>
         </View>
       </View>

@@ -140,7 +140,7 @@ export const SplashScreenView: React.FC<SplashScreenViewProps> = ({
           </View>
 
           <Text style={styles.tagline}>
-            Shop Quality • Fast Delivery • Pay with Paystack
+            Shop Quality • Fast Delivery • Secure Payments
           </Text>
         </Animated.View>
 

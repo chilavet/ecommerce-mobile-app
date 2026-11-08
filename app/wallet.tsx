@@ -68,7 +68,7 @@ export default function WalletScreen() {
 
     Alert.alert(
       'Wallet Funded! 💳',
-      `Successfully added ${formatNaira(res.amount)} to your ShopPulse Wallet via Paystack.\n\nTransaction Ref: ${res.reference}`,
+      `Successfully added ${formatNaira(res.amount)} to your ShopPulse Wallet.\n\nTransaction Ref: ${res.reference}`,
       [{ text: 'Great!' }]
     );
   };
@@ -89,8 +89,8 @@ export default function WalletScreen() {
             <Ionicons name="wifi" size={20} color="#94A3B8" style={{ transform: [{ rotate: '90deg' }] }} />
           </View>
           <View style={styles.paystackPartnerBadge}>
-            <Ionicons name="flash" size={12} color="#0BA4DB" />
-            <Text style={styles.paystackPartnerText}>Paystack Powered</Text>
+            <Ionicons name="shield-checkmark" size={12} color="#10B981" />
+            <Text style={styles.paystackPartnerText}>Verified Digital Wallet</Text>
           </View>
         </View>
 
@@ -137,7 +137,7 @@ export default function WalletScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.fundBtnTitle}>Fund Wallet</Text>
-            <Text style={styles.fundBtnSub}>Deposit with Paystack Card, Transfer or USSD</Text>
+            <Text style={styles.fundBtnSub}>Deposit with Card, Bank Transfer or USSD</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#FFFFFF" />
         </TouchableOpacity>
@@ -218,13 +218,13 @@ export default function WalletScreen() {
 
               <View style={{ flex: 1, marginRight: 8 }}>
                 <Text style={styles.txDesc} numberOfLines={1}>
-                  {tx.description}
+                  {tx.description.replace(/via Paystack/gi, '(Card Deposit)').replace(/Paystack/gi, 'Card')}
                 </Text>
                 <View style={styles.txMetaRow}>
                   <View style={styles.channelPill}>
                     <Text style={styles.channelPillText}>
                       {tx.channel === 'paystack'
-                        ? 'Paystack'
+                        ? 'Card Deposit'
                         : tx.channel === 'checkout'
                         ? 'Order'
                         : 'Bonus'}
@@ -279,7 +279,7 @@ export default function WalletScreen() {
             <View style={styles.fundModalHeader}>
               <View>
                 <Text style={styles.fundModalTitle}>Fund Digital Wallet</Text>
-                <Text style={styles.fundModalSub}>Powered by Paystack Gateway</Text>
+                <Text style={styles.fundModalSub}>Secure Payment Gateway</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setFundModalVisible(false)}
@@ -305,7 +305,7 @@ export default function WalletScreen() {
             <View style={styles.paystackNotice}>
               <Ionicons name="shield-checkmark" size={16} color="#0BA4DB" />
               <Text style={styles.paystackNoticeText}>
-                Secure 256-bit SSL encrypted checkout with Paystack. Instant deposit into your wallet.
+                Secure 256-bit SSL encrypted deposit. Funds reflect immediately in your wallet.
               </Text>
             </View>
 
@@ -314,9 +314,11 @@ export default function WalletScreen() {
               onPress={handleProceedToPaystack}
               activeOpacity={0.8}
             >
-              <Ionicons name="flash" size={18} color="#FFFFFF" />
+              <Ionicons name="lock-closed" size={18} color="#FFFFFF" />
               <Text style={styles.continueToPaystackText}>
-                Pay with Paystack ({formatNaira(parseFloat(topUpAmount || '0'))})
+                {topUpAmount && parseFloat(topUpAmount) > 0
+                  ? `Proceed to Deposit (${formatNaira(parseFloat(topUpAmount))})`
+                  : 'Proceed to Deposit'}
               </Text>
             </TouchableOpacity>
           </TouchableOpacity>

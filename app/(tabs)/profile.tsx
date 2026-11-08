@@ -267,10 +267,6 @@ export default function ProfileScreen() {
           <View style={{ flex: 1, marginRight: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               <Text style={styles.menuLabel}>ShopPulse Wallet</Text>
-              <View style={styles.walletPill}>
-                <Ionicons name="flash" size={10} color="#0BA4DB" />
-                <Text style={styles.walletPillText}>Paystack</Text>
-              </View>
             </View>
             <Text style={styles.menuSubLabel}>
               Balance: {formatNaira(balance)} • 1-tap checkout
@@ -428,12 +424,7 @@ export default function ProfileScreen() {
                 <Ionicons name="wallet" size={22} color="#10B981" />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={styles.paymentCardTitle}>ShopPulse Wallet</Text>
-                  <View style={styles.walletPill}>
-                    <Text style={styles.walletPillText}>Paystack</Text>
-                  </View>
-                </View>
+                <Text style={styles.paymentCardTitle}>ShopPulse Wallet</Text>
                 <Text style={styles.paymentCardSubtitle}>
                   Balance: {formatNaira(balance)} • 1-tap pay
                 </Text>
@@ -443,18 +434,13 @@ export default function ProfileScreen() {
               </View>
             </TouchableOpacity>
 
-            {/* 2. Pay with Card (Paystack Secured) */}
+            {/* 2. Pay with Card */}
             <View style={styles.paymentCard}>
               <View style={[styles.paymentIconBox, { backgroundColor: '#E0F2FE' }]}>
                 <Ionicons name="card-outline" size={22} color="#0BA4DB" />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={styles.paymentCardTitle}>Pay with Card</Text>
-                  <View style={styles.walletPill}>
-                    <Text style={styles.walletPillText}>PAYSTACK</Text>
-                  </View>
-                </View>
+                <Text style={styles.paymentCardTitle}>Pay with Card</Text>
                 <Text style={styles.paymentCardSubtitle}>Mastercard, Visa, Verve • Instant</Text>
               </View>
               <View style={styles.defaultBadge}>

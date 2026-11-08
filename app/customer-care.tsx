@@ -54,14 +54,14 @@ const FAQS_DATA: FAQItem[] = [
     category: 'Payments',
     question: 'What payment methods do you accept?',
     answer:
-      'We support direct Nigerian Debit & Credit Cards (Mastercard, Visa, and Verve) processed securely through the Paystack Payment Gateway, as well as your ShopPulse Digital Wallet balance in Naira (₦).',
+      'We support direct Nigerian Debit & Credit Cards (Mastercard, Visa, and Verve) processed securely through our encrypted payment gateway, as well as your ShopPulse Digital Wallet balance in Naira (₦).',
   },
   {
     id: 'faq_4',
     category: 'Wallet',
     question: 'How does the ShopPulse Digital Wallet work?',
     answer:
-      'Your digital wallet lets you store Naira funds for instant 1-tap checkout. You can fund your wallet using Paystack via card or bank transfer. Wallet transactions have zero processing fees.',
+      'Your digital wallet lets you store Naira funds for instant 1-tap checkout. You can fund your wallet via debit card or bank transfer. Wallet transactions have zero processing fees.',
   },
   {
     id: 'faq_5',
@@ -80,9 +80,9 @@ const FAQS_DATA: FAQItem[] = [
   {
     id: 'faq_7',
     category: 'Payments',
-    question: 'Are my Paystack card details secure?',
+    question: 'Are my card details secure?',
     answer:
-      'Yes, 100% secure. ShopPulse does not store your card details or CVV. All card payments are processed using Paystack\'s tokenized PCI-DSS Level 1 certified gateway with 256-bit bank-grade encryption and 3D Secure OTP authentication.',
+      'Yes, 100% secure. ShopPulse does not store your card details or CVV. All card payments are processed using a tokenized PCI-DSS Level 1 certified gateway with 256-bit bank-grade encryption and 3D Secure OTP authentication.',
   },
   {
     id: 'faq_8',
@@ -95,7 +95,7 @@ const FAQS_DATA: FAQItem[] = [
 
 const COMPLAINT_CATEGORIES = [
   '📦 Order & Delivery Delay',
-  '💳 Payment & Paystack Charge',
+  '💳 Payment & Card Charge',
   '⚠️ Damaged or Wrong Item',
   '👛 Wallet Balance Issue',
   '🔒 Account & Login Help',
@@ -537,7 +537,7 @@ export default function CustomerCareScreen() {
                   </View>
                   <Text style={styles.attachBoxTitle}>Add Supporting Media Proof</Text>
                   <Text style={styles.attachBoxSubtitle}>
-                    Upload photo of damaged parcel, wrong item, or Paystack debit alert receipt.
+                    Upload photo of damaged parcel, wrong item, or bank debit alert receipt.
                   </Text>
 
                   <View style={styles.attachBtnsRow}>
@@ -593,7 +593,7 @@ export default function CustomerCareScreen() {
               <Ionicons name="search" size={18} color={Colors.light.textMuted} style={{ marginRight: 8 }} />
               <TextInput
                 style={styles.faqSearchInput}
-                placeholder="Search FAQs (e.g. delivery, Paystack, refund)..."
+                placeholder="Search FAQs (e.g. delivery, payment, refund)..."
                 placeholderTextColor={Colors.light.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}

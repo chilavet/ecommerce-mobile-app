@@ -102,7 +102,7 @@ export default function AboutScreen() {
                 <Text style={styles.nigeriaPillText}>🇳🇬 Nigeria's E-Commerce Hub</Text>
               </View>
               <Text style={styles.brandSubtitle}>
-                The next-generation mobile shopping experience built specifically for Nigerian consumers, featuring instant Paystack payments, digital wallet checkout, and verified nationwide logistics.
+                The next-generation mobile shopping experience built specifically for Nigerian consumers, featuring instant card payments, digital wallet checkout, and verified nationwide logistics.
               </Text>
               <View style={styles.buildBadge}>
                 <Text style={styles.buildBadgeText}>Version 1.0.0 • Build 42 (Release 2026.11)</Text>
@@ -126,7 +126,7 @@ export default function AboutScreen() {
                 <View style={[styles.featureIconCircle, { backgroundColor: '#F0FDF4' }]}>
                   <Ionicons name="card" size={20} color="#16A34A" />
                 </View>
-                <Text style={styles.featureTitle}>Paystack Integration</Text>
+                <Text style={styles.featureTitle}>Secure Card Payments</Text>
                 <Text style={styles.featureDesc}>
                   PCI-DSS Level 1 certified gateway accepting Nigerian Mastercard, Visa, and Verve cards with 3D Secure OTP.
                 </Text>
@@ -193,7 +193,7 @@ export default function AboutScreen() {
               <View style={styles.specDivider} />
               <View style={styles.specRow}>
                 <Text style={styles.specLabel}>Payment Gateway</Text>
-                <Text style={styles.specValue}>Paystack Inline &amp; Webhook Service</Text>
+                <Text style={styles.specValue}>Encrypted 256-bit Card &amp; Bank Gateway</Text>
               </View>
               <View style={styles.specDivider} />
               <View style={styles.specRow}>
@@ -269,9 +269,9 @@ export default function AboutScreen() {
             {/* Section 3 */}
             <View style={[styles.legalCard, Shadows.sm]}>
               <Text style={styles.clauseNumber}>SECTION 3</Text>
-              <Text style={styles.clauseTitle}>Payment Methods &amp; Paystack Processing</Text>
+              <Text style={styles.clauseTitle}>Payment Methods &amp; Card Processing</Text>
               <Text style={styles.clauseBody}>
-                We accept payments via the Paystack payment gateway (Mastercard, Visa, Verve) and the ShopPulse Digital Wallet. All card transactions undergo automated tokenization and bank OTP verification. ShopPulse does not store credit or debit card CVV numbers. Fraudulent payment attempts will be reported to Nigerian law enforcement authorities.
+                We accept payments via debit and credit cards (Mastercard, Visa, Verve) and the ShopPulse Digital Wallet. All card transactions undergo automated tokenization and bank OTP verification. ShopPulse does not store credit or debit card CVV numbers. Fraudulent payment attempts will be reported to Nigerian law enforcement authorities.
               </Text>
             </View>
 
@@ -336,7 +336,7 @@ export default function AboutScreen() {
                 We collect personal information necessary to deliver our e-commerce services:
                 {'\n'}• Account Identification: Full name, verified email address, phone number.
                 {'\n'}• Location &amp; Geolocation Data: Device GPS coordinates and selected delivery area (e.g. Ikeja, Lekki, Abuja) to calculate distance to regional hubs and dispatch couriers.
-                {'\n'}• Transaction Records: Ordered items, totals in Naira, Paystack payment references, and digital wallet history.
+                {'\n'}• Transaction Records: Ordered items, totals in Naira, payment references, and digital wallet history.
                 {'\n'}• Support Media: Photographs or screenshots voluntarily attached to customer care tickets.
               </Text>
             </View>
@@ -346,7 +346,7 @@ export default function AboutScreen() {
               <Text style={styles.clauseNumber}>ARTICLE 2</Text>
               <Text style={styles.clauseTitle}>Payment Security &amp; Financial Privacy</Text>
               <Text style={styles.clauseBody}>
-                ShopPulse does NOT store your credit/debit card numbers, CVV security codes, or banking PINs on any server. All payment processing is conducted via Paystack's tokenized, PCI-DSS Level 1 certified gateway. Your card credentials are encrypted with 256-bit bank-grade SSL and transmitted directly to your issuing Nigerian bank.
+                ShopPulse does NOT store your credit/debit card numbers, CVV security codes, or banking PINs on any server. All payment processing is conducted via a tokenized, PCI-DSS Level 1 certified gateway. Your card credentials are encrypted with 256-bit bank-grade SSL and transmitted directly to your issuing Nigerian bank.
               </Text>
             </View>
 

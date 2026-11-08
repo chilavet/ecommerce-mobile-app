@@ -251,12 +251,7 @@ export default function CheckoutScreen() {
               <Ionicons name="card-outline" size={18} color="#0BA4DB" />
             </View>
             <View style={{ flex: 1, marginLeft: 8 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={styles.methodTitle}>Pay with Card</Text>
-                <View style={styles.paystackPill}>
-                  <Text style={styles.paystackPillText}>PAYSTACK</Text>
-                </View>
-              </View>
+              <Text style={styles.methodTitle}>Pay with Card</Text>
               <Text style={styles.methodSubtitle}>Mastercard, Visa, Verve (Instant)</Text>
             </View>
             <View style={styles.secureBadge}>
