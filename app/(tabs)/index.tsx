@@ -21,12 +21,14 @@ import { LocationPickerModal } from '@/src/components/LocationPickerModal';
 import { useAuth } from '@/src/context/AuthContext';
 import { useNotifications } from '@/src/context/NotificationContext';
 import { useLocation } from '@/src/context/LocationContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { openGoogleMaps } from '@/src/utils/location';
 
 export default function ShopHomeScreen() {
   const { user } = useAuth();
   const { unreadCount } = useNotifications();
   const { currentLocation, enrichAndSortProducts } = useLocation();
+  const { colors, isDark } = useTheme();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -71,9 +73,9 @@ export default function ShopHomeScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -85,23 +87,23 @@ export default function ShopHomeScreen() {
             onPress={() => setLocationModalVisible(true)}
             activeOpacity={0.7}
           >
-            <Ionicons name="location-sharp" size={15} color={Colors.primary} />
-            <Text style={styles.deliverToLabel}>Deliver to:</Text>
-            <Text style={styles.selectedAreaText} numberOfLines={1}>
+            <Ionicons name="location-sharp" size={15} color={colors.primary} />
+            <Text style={[styles.deliverToLabel, { color: colors.textSecondary }]}>Deliver to:</Text>
+            <Text style={[styles.selectedAreaText, { color: colors.text }]} numberOfLines={1}>
               {currentLocation.city || currentLocation.name}
             </Text>
-            <Ionicons name="chevron-down" size={13} color={Colors.light.textSecondary} />
+            <Ionicons name="chevron-down" size={13} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
 
         {/* Header Greeting & Notifications */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Welcome back,</Text>
-            <Text style={styles.userName}>{user ? user.name : 'Guest Shopper'} 👋</Text>
+            <Text style={[styles.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>{user ? user.name : 'Guest Shopper'} 👋</Text>
           </View>
           <TouchableOpacity
-            style={styles.notificationBtn}
+            style={[styles.notificationBtn, { backgroundColor: colors.card, borderColor: colors.border }]}
             onPress={() => router.push('/notifications')}
             accessibilityLabel="Notifications"
             accessibilityRole="button"
@@ -109,7 +111,7 @@ export default function ShopHomeScreen() {
             <Ionicons
               name={unreadCount > 0 ? 'notifications' : 'notifications-outline'}
               size={22}
-              color={unreadCount > 0 ? Colors.primary : Colors.light.text}
+              color={unreadCount > 0 ? colors.primary : colors.text}
             />
             {unreadCount > 0 && (
               <View style={styles.unreadBadge}>
@@ -140,13 +142,13 @@ export default function ShopHomeScreen() {
             onPress={() => setSelectedCategoryId('cat_all')}
           >
             <Text style={styles.bannerBtnText}>Shop Now</Text>
-            <Ionicons name="arrow-forward" size={16} color={Colors.primary} />
+            <Ionicons name="arrow-forward" size={16} color={colors.primary} />
           </TouchableOpacity>
         </View>
 
         {/* Categories Horizontal Scroll */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Categories</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Categories</Text>
         </View>
         <ScrollView
           horizontal
@@ -169,9 +171,9 @@ export default function ShopHomeScreen() {
           selectedCategoryId === 'cat_all' && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Featured Deals 🔥</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Deals 🔥</Text>
                 <TouchableOpacity onPress={() => setSelectedCategoryId('cat_all')}>
-                  <Text style={styles.seeAllText}>See All</Text>
+                  <Text style={[styles.seeAllText, { color: colors.primary }]}>See All</Text>
                 </TouchableOpacity>
               </View>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -187,7 +189,7 @@ export default function ShopHomeScreen() {
         {/* Main Product Grid */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>
               {searchQuery
                 ? `Search Results (${products.length})`
                 : 'All Products'}
@@ -195,12 +197,12 @@ export default function ShopHomeScreen() {
           </View>
 
           {loading ? (
-            <ActivityIndicator size="large" color={Colors.primary} style={{ marginTop: 20 }} />
+            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 20 }} />
           ) : products.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons name="search-outline" size={48} color={Colors.light.textMuted} />
-              <Text style={styles.emptyTitle}>No products found</Text>
-              <Text style={styles.emptySubtitle}>Try adjusting your search terms or filter.</Text>
+              <Ionicons name="search-outline" size={48} color={colors.textMuted} />
+              <Text style={[styles.emptyTitle, { color: colors.text }]}>No products found</Text>
+              <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Try adjusting your search terms or filter.</Text>
             </View>
           ) : (
             <View style={styles.productGrid}>

@@ -10,6 +10,7 @@ import {
   Alert,
   Image,
   ActivityIndicator,
+  Switch,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router, useFocusEffect } from 'expo-router';
@@ -17,6 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { useLocation } from '@/src/context/LocationContext';
 import { useNotifications } from '@/src/context/NotificationContext';
 import { useWallet } from '@/src/context/WalletContext';
@@ -47,6 +49,7 @@ function formatMemberDate(isoString?: string): string {
 
 export default function ProfileScreen() {
   const { user, login, register, updateProfile, logout } = useAuth();
+  const { colors, isDark, themeMode, followSystem, setThemeMode, setFollowSystem, toggleTheme } = useTheme();
   const { currentLocation } = useLocation();
   const { unreadCount } = useNotifications();
   const { balance, currency } = useWallet();
@@ -58,6 +61,7 @@ export default function ProfileScreen() {
   // Modals state
   const [locationModalVisible, setLocationModalVisible] = useState(false);
   const [paymentModalVisible, setPaymentModalVisible] = useState(false);
+  const [themeModalVisible, setThemeModalVisible] = useState(false);
   const [authModalVisible, setAuthModalVisible] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
 
@@ -319,12 +323,12 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
       {/* 1. User Header Profile Card */}
-      <View style={[styles.profileCard, Shadows.sm]}>
+      <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
         <TouchableOpacity
           style={styles.avatarWrapper}
           onPress={() => {
@@ -353,7 +357,7 @@ export default function ProfileScreen() {
 
         <View style={styles.userInfo}>
           <View style={styles.nameRow}>
-            <Text style={styles.userName}>{user ? user.name : 'Guest Shopper'}</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>{user ? user.name : 'Guest Shopper'}</Text>
             {user && (
               <View style={styles.verifiedBadge}>
                 <Ionicons name="shield-checkmark" size={13} color="#10B981" />
@@ -361,7 +365,7 @@ export default function ProfileScreen() {
               </View>
             )}
           </View>
-          <Text style={styles.userEmail} numberOfLines={1}>
+          <Text style={[styles.userEmail, { color: colors.textSecondary }]} numberOfLines={1}>
             {user ? user.email : 'Sign in to sync orders & saved addresses'}
           </Text>
         </View>
@@ -391,68 +395,68 @@ export default function ProfileScreen() {
       {/* 2. Quick Overview Stats Bar */}
       <View style={styles.statsRow}>
         <TouchableOpacity
-          style={[styles.statCard, Shadows.sm]}
+          style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}
           onPress={() => router.push('/(tabs)/orders')}
           activeOpacity={0.7}
         >
-          <View style={[styles.statIconCircle, { backgroundColor: '#EFF6FF' }]}>
+          <View style={[styles.statIconCircle, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
             <Ionicons name="bag-handle-outline" size={18} color={Colors.primary} />
           </View>
-          <Text style={styles.statValue}>{ordersCount}</Text>
-          <Text style={styles.statLabel}>My Orders</Text>
+          <Text style={[styles.statValue, { color: colors.text }]}>{ordersCount}</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>My Orders</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.statCard, Shadows.sm]}
+          style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}
           onPress={() => setLocationModalVisible(true)}
           activeOpacity={0.7}
         >
-          <View style={[styles.statIconCircle, { backgroundColor: '#ECFDF5' }]}>
+          <View style={[styles.statIconCircle, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
             <Ionicons name="location-outline" size={18} color="#10B981" />
           </View>
-          <Text style={styles.statValue} numberOfLines={1}>
+          <Text style={[styles.statValue, { color: colors.text }]} numberOfLines={1}>
             {userAddress?.city || currentLocation.city || 'Location'}
           </Text>
-          <Text style={styles.statLabel}>Delivery Hub</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Delivery Hub</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.statCard, Shadows.sm]}
+          style={[styles.statCard, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}
           onPress={() => router.push('/notifications')}
           activeOpacity={0.7}
         >
-          <View style={[styles.statIconCircle, { backgroundColor: '#FFFBEB' }]}>
+          <View style={[styles.statIconCircle, { backgroundColor: isDark ? '#451A03' : '#FFFBEB' }]}>
             <Ionicons name="notifications-outline" size={18} color="#F59E0B" />
           </View>
-          <Text style={styles.statValue}>
+          <Text style={[styles.statValue, { color: colors.text }]}>
             {unreadCount > 0 ? `${unreadCount} new` : 'All read'}
           </Text>
-          <Text style={styles.statLabel}>Alerts</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Alerts</Text>
         </TouchableOpacity>
       </View>
 
       {/* 3. Section: Wallet & Payment */}
-      <View style={[styles.menuSection, Shadows.sm]}>
-        <Text style={styles.sectionTitle}>Wallet &amp; Payment</Text>
+      <View style={[styles.menuSection, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Wallet &amp; Payment</Text>
 
         {/* Digital Wallet */}
         <TouchableOpacity
-          style={styles.menuRow}
+          style={[styles.menuRow, { borderBottomColor: colors.divider }]}
           onPress={() => router.push('/wallet')}
           activeOpacity={0.7}
         >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#ECFDF5' }]}>
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
             <Ionicons name="wallet-outline" size={20} color="#10B981" />
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Text style={styles.menuLabel}>ShopPulse Wallet</Text>
+              <Text style={[styles.menuLabel, { color: colors.text }]}>ShopPulse Wallet</Text>
             </View>
-            <Text style={styles.menuSubLabel}>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
               Balance: {formatNaira(balance)} • 1-tap checkout
             </Text>
           </View>
-          <View style={[styles.changeBadge, { backgroundColor: '#ECFDF5' }]}>
+          <View style={[styles.changeBadge, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
             <Text style={[styles.changeBadgeText, { color: '#059669' }]}>Fund</Text>
             <Ionicons name="chevron-forward" size={14} color="#059669" />
           </View>
@@ -464,57 +468,93 @@ export default function ProfileScreen() {
           onPress={() => setPaymentModalVisible(true)}
           activeOpacity={0.7}
         >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#F3E8FF' }]}>
-            <Ionicons name="card-outline" size={20} color="#9333EA" />
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#3B0764' : '#F3E8FF' }]}>
+            <Ionicons name="card-outline" size={20} color="#A855F7" />
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.menuLabel}>Payment Options</Text>
-            <Text style={styles.menuSubLabel}>Wallet &amp; Card (Mastercard, Visa, Verve)</Text>
+            <Text style={[styles.menuLabel, { color: colors.text }]}>Payment Options</Text>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>Wallet &amp; Card (Mastercard, Visa, Verve)</Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
 
       {/* 4. Section: Settings & Preferences */}
-      <View style={[styles.menuSection, Shadows.sm]}>
-        <Text style={styles.sectionTitle}>App &amp; Security Settings</Text>
+      <View style={[styles.menuSection, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>App &amp; Security Settings</Text>
+
+        {/* Appearance & Theme (Dark Mode & Phone Settings) */}
+        <TouchableOpacity
+          style={[styles.menuRow, { borderBottomColor: colors.divider }]}
+          onPress={() => setThemeModalVisible(true)}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#312E81' : '#EEF2FF' }]}>
+            <Ionicons
+              name={isDark ? 'moon' : 'sunny'}
+              size={20}
+              color={isDark ? '#A5B4FC' : '#4F46E5'}
+            />
+          </View>
+          <View style={{ flex: 1, marginRight: 8 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={[styles.menuLabel, { color: colors.text }]}>Appearance &amp; Theme</Text>
+              {followSystem && (
+                <View style={[styles.themeFollowBadge, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+                  <Text style={[styles.themeFollowBadgeText, { color: Colors.primary }]}>AUTO</Text>
+                </View>
+              )}
+            </View>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
+              {followSystem
+                ? `Follow Phone (${isDark ? 'Dark' : 'Light'})`
+                : (isDark ? 'Dark Mode' : 'Light Mode')}
+            </Text>
+          </View>
+          <Switch
+            value={isDark}
+            onValueChange={toggleTheme}
+            trackColor={{ false: '#CBD5E1', true: Colors.primary }}
+            thumbColor="#FFFFFF"
+          />
+        </TouchableOpacity>
 
         {/* Personal Details / Profile Info */}
         {user && (
           <TouchableOpacity
-            style={styles.menuRow}
+            style={[styles.menuRow, { borderBottomColor: colors.divider }]}
             onPress={handleOpenEditProfile}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIconWrapper, { backgroundColor: '#EFF6FF' }]}>
+            <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
               <Ionicons name="person-outline" size={20} color={Colors.primary} />
             </View>
             <View style={{ flex: 1, marginRight: 8 }}>
-              <Text style={styles.menuLabel}>Personal Details</Text>
-              <Text style={styles.menuSubLabel}>
+              <Text style={[styles.menuLabel, { color: colors.text }]}>Personal Details</Text>
+              <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
                 Manage contact &amp; delivery info
               </Text>
             </View>
-            <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+            <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </TouchableOpacity>
         )}
 
         {/* Security & Password -> single source of truth for passwords */}
         <TouchableOpacity
-          style={styles.menuRow}
+          style={[styles.menuRow, { borderBottomColor: colors.divider }]}
           onPress={() => router.push('/settings')}
           activeOpacity={0.7}
         >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#EFF6FF' }]}>
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
             <Ionicons name="shield-checkmark-outline" size={20} color={Colors.primary} />
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.menuLabel}>Security &amp; Password</Text>
-            <Text style={styles.menuSubLabel}>
+            <Text style={[styles.menuLabel, { color: colors.text }]}>Security &amp; Password</Text>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
               Change password, delete account
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
         </TouchableOpacity>
 
         {/* Notification Preferences */}
@@ -523,36 +563,36 @@ export default function ProfileScreen() {
           onPress={() => router.push('/notifications-settings')}
           activeOpacity={0.7}
         >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#FEF3C7' }]}>
-            <Ionicons name="notifications-outline" size={20} color="#D97706" />
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#3E2723' : '#FEF3C7' }]}>
+            <Ionicons name="notifications-outline" size={20} color="#F59E0B" />
           </View>
           <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.menuLabel}>Notification Preferences</Text>
-            <Text style={styles.menuSubLabel}>
+            <Text style={[styles.menuLabel, { color: colors.text }]}>Notification Preferences</Text>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>
               Push alerts, deals &amp; order email receipts
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
         </TouchableOpacity>
       </View>
 
       {/* 5. Section: Support & Info */}
-      <View style={[styles.menuSection, Shadows.sm]}>
-        <Text style={styles.sectionTitle}>Support &amp; About</Text>
+      <View style={[styles.menuSection, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
+        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Support &amp; About</Text>
 
         <TouchableOpacity
-          style={styles.menuRow}
+          style={[styles.menuRow, { borderBottomColor: colors.divider }]}
           onPress={() => router.push('/customer-care')}
           activeOpacity={0.7}
         >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#ECFDF5' }]}>
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
             <Ionicons name="headset-outline" size={20} color="#059669" />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.menuLabel}>Customer Care &amp; FAQs</Text>
-            <Text style={styles.menuSubLabel}>24/7 live assistance and support contacts</Text>
+            <Text style={[styles.menuLabel, { color: colors.text }]}>Customer Care &amp; FAQs</Text>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>24/7 live assistance and support contacts</Text>
           </View>
-          <Ionicons name="chevron-forward" size={18} color={Colors.light.textMuted} />
+          <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -560,21 +600,21 @@ export default function ProfileScreen() {
           onPress={() => router.push('/about')}
           activeOpacity={0.7}
         >
-          <View style={[styles.menuIconWrapper, { backgroundColor: '#F1F5F9' }]}>
-            <Ionicons name="information-circle-outline" size={20} color={Colors.light.textSecondary} />
+          <View style={[styles.menuIconWrapper, { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' }]}>
+            <Ionicons name="information-circle-outline" size={20} color={colors.textSecondary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={styles.menuLabel}>About ShopPulse</Text>
-            <Text style={styles.menuSubLabel}>Version 1.0.0 • Terms &amp; Privacy</Text>
+            <Text style={[styles.menuLabel, { color: colors.text }]}>About ShopPulse</Text>
+            <Text style={[styles.menuSubLabel, { color: colors.textSecondary }]}>Version 1.0.0 • Terms &amp; Privacy</Text>
           </View>
-          <Text style={styles.versionBadge}>v1.0.0</Text>
+          <Text style={[styles.versionBadge, { backgroundColor: colors.subCard, color: colors.textMuted }]}>v1.0.0</Text>
         </TouchableOpacity>
       </View>
 
       {/* 6. Sign Out Button (When Signed In) */}
       {user && (
         <TouchableOpacity
-          style={[styles.logoutBtn, Shadows.sm]}
+          style={[styles.logoutBtn, { backgroundColor: colors.card, borderColor: isDark ? '#7F1D1D' : '#FEE2E2' }, Shadows.sm]}
           onPress={handleLogout}
           activeOpacity={0.8}
         >
@@ -597,53 +637,53 @@ export default function ProfileScreen() {
         >
           <TouchableOpacity
             activeOpacity={1}
-            style={[styles.modalContent, Shadows.lg]}
+            style={[styles.modalContent, { backgroundColor: colors.modalBg }, Shadows.lg]}
             onPress={(e) => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Saved Payment Methods</Text>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Saved Payment Methods</Text>
               <TouchableOpacity
                 onPress={() => setPaymentModalVisible(false)}
                 hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
                 style={{ padding: 4 }}
               >
-                <Ionicons name="close" size={24} color={Colors.light.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
             {/* 1. ShopPulse Digital Wallet */}
             <TouchableOpacity
-              style={styles.paymentCard}
+              style={[styles.paymentCard, { backgroundColor: colors.subCard, borderColor: colors.border }]}
               onPress={() => {
                 setPaymentModalVisible(false);
                 router.push('/wallet');
               }}
               activeOpacity={0.8}
             >
-              <View style={[styles.paymentIconBox, { backgroundColor: '#ECFDF5' }]}>
+              <View style={[styles.paymentIconBox, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
                 <Ionicons name="wallet" size={22} color="#10B981" />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.paymentCardTitle}>ShopPulse Wallet</Text>
-                <Text style={styles.paymentCardSubtitle}>
+                <Text style={[styles.paymentCardTitle, { color: colors.text }]}>ShopPulse Wallet</Text>
+                <Text style={[styles.paymentCardSubtitle, { color: colors.textSecondary }]}>
                   Balance: {formatNaira(balance)} • 1-tap pay
                 </Text>
               </View>
-              <View style={[styles.defaultBadge, { backgroundColor: '#EFF6FF' }]}>
+              <View style={[styles.defaultBadge, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
                 <Text style={[styles.defaultBadgeText, { color: Colors.primary }]}>OPEN</Text>
               </View>
             </TouchableOpacity>
 
             {/* 2. Pay with Card */}
-            <View style={styles.paymentCard}>
-              <View style={[styles.paymentIconBox, { backgroundColor: '#E0F2FE' }]}>
+            <View style={[styles.paymentCard, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
+              <View style={[styles.paymentIconBox, { backgroundColor: isDark ? '#0C4A6E' : '#E0F2FE' }]}>
                 <Ionicons name="card-outline" size={22} color="#0BA4DB" />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
-                <Text style={styles.paymentCardTitle}>Pay with Card</Text>
-                <Text style={styles.paymentCardSubtitle}>Mastercard, Visa, Verve • Instant</Text>
+                <Text style={[styles.paymentCardTitle, { color: colors.text }]}>Pay with Card</Text>
+                <Text style={[styles.paymentCardSubtitle, { color: colors.textSecondary }]}>Mastercard, Visa, Verve • Instant</Text>
               </View>
-              <View style={styles.defaultBadge}>
+              <View style={[styles.defaultBadge, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
                 <Text style={styles.defaultBadgeText}>ACTIVE</Text>
               </View>
             </View>
@@ -657,6 +697,188 @@ export default function ProfileScreen() {
             >
               <Ionicons name="add" size={18} color="#FFFFFF" />
               <Text style={styles.addPaymentBtnText}>Add Payment Method</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Theme & Display Mode Modal */}
+      <Modal
+        visible={themeModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setThemeModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setThemeModalVisible(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            style={[styles.modalContent, { backgroundColor: colors.modalBg }, Shadows.lg]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>Appearance &amp; Theme</Text>
+                <Text style={[styles.modalSubTitle, { color: colors.textSecondary }]}>
+                  Light, dark, and follow phone settings
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setThemeModalVisible(false)}
+                hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
+                style={{ padding: 4 }}
+              >
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Follow Phone Settings Toggle Card */}
+            <View
+              style={[
+                styles.themeOptionCard,
+                {
+                  backgroundColor: colors.subCard,
+                  borderColor: followSystem ? Colors.primary : colors.border,
+                },
+              ]}
+            >
+              <View style={{ flex: 1, marginRight: 12 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <Ionicons name="phone-portrait-outline" size={20} color={Colors.primary} />
+                  <Text style={[styles.themeOptionTitle, { color: colors.text }]}>
+                    Follow Phone Settings
+                  </Text>
+                </View>
+                <Text style={[styles.themeOptionDesc, { color: colors.textSecondary }]}>
+                  Automatically match your device's light or dark mode when your phone changes.
+                </Text>
+              </View>
+              <Switch
+                value={followSystem}
+                onValueChange={(val) => setFollowSystem(val)}
+                trackColor={{ false: '#CBD5E1', true: Colors.primary }}
+                thumbColor="#FFFFFF"
+              />
+            </View>
+
+            {/* Mode Selector Buttons */}
+            <Text style={[styles.presetSectionTitle, { color: colors.textMuted }]}>
+              SELECT PREFERRED MODE
+            </Text>
+            <View style={styles.themeButtonsRow}>
+              {/* Light Option */}
+              <TouchableOpacity
+                style={[
+                  styles.themeModeBtn,
+                  { backgroundColor: colors.subCard, borderColor: colors.border },
+                  themeMode === 'light' && { borderColor: Colors.primary, backgroundColor: isDark ? '#1E293B' : '#EFF6FF' },
+                ]}
+                onPress={() => setThemeMode('light')}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name="sunny"
+                  size={20}
+                  color={themeMode === 'light' ? Colors.primary : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.themeModeBtnText,
+                    { color: colors.text },
+                    themeMode === 'light' && { color: Colors.primary, fontWeight: '800' },
+                  ]}
+                >
+                  Light
+                </Text>
+                {themeMode === 'light' && (
+                  <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
+                )}
+              </TouchableOpacity>
+
+              {/* Dark Option */}
+              <TouchableOpacity
+                style={[
+                  styles.themeModeBtn,
+                  { backgroundColor: colors.subCard, borderColor: colors.border },
+                  themeMode === 'dark' && { borderColor: Colors.primary, backgroundColor: isDark ? '#1E293B' : '#EFF6FF' },
+                ]}
+                onPress={() => setThemeMode('dark')}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name="moon"
+                  size={20}
+                  color={themeMode === 'dark' ? Colors.primary : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.themeModeBtnText,
+                    { color: colors.text },
+                    themeMode === 'dark' && { color: Colors.primary, fontWeight: '800' },
+                  ]}
+                >
+                  Dark
+                </Text>
+                {themeMode === 'dark' && (
+                  <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
+                )}
+              </TouchableOpacity>
+
+              {/* System Option */}
+              <TouchableOpacity
+                style={[
+                  styles.themeModeBtn,
+                  { backgroundColor: colors.subCard, borderColor: colors.border },
+                  themeMode === 'system' && { borderColor: Colors.primary, backgroundColor: isDark ? '#1E293B' : '#EFF6FF' },
+                ]}
+                onPress={() => setThemeMode('system')}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name="phone-portrait"
+                  size={20}
+                  color={themeMode === 'system' ? Colors.primary : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.themeModeBtnText,
+                    { color: colors.text },
+                    themeMode === 'system' && { color: Colors.primary, fontWeight: '800' },
+                  ]}
+                >
+                  System
+                </Text>
+                {themeMode === 'system' && (
+                  <Ionicons name="checkmark-circle" size={16} color={Colors.primary} />
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* Current Active Mode Info */}
+            <View style={[styles.themeStatusNotice, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
+              <Ionicons
+                name="information-circle-outline"
+                size={18}
+                color={Colors.primary}
+              />
+              <Text style={[styles.themeStatusText, { color: colors.textSecondary }]}>
+                Current appearance:{' '}
+                <Text style={{ fontWeight: '800', color: colors.text }}>
+                  {isDark ? 'Dark Mode 🌙' : 'Light Mode ☀️'}
+                </Text>
+                {followSystem && ' (Synced with device)'}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.submitModalBtn}
+              onPress={() => setThemeModalVisible(false)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.submitModalBtnText}>Apply &amp; Close</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         </TouchableOpacity>
@@ -676,13 +898,13 @@ export default function ProfileScreen() {
         onRequestClose={() => setAuthModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, Shadows.lg]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.modalBg }, Shadows.lg]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
                 {authMode === 'login' ? 'Welcome Back' : 'Create Account'}
               </Text>
               <TouchableOpacity onPress={() => setAuthModalVisible(false)}>
-                <Ionicons name="close" size={24} color={Colors.light.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -695,19 +917,21 @@ export default function ProfileScreen() {
 
             {authMode === 'register' && (
               <>
-                <Text style={styles.inputLabel}>Full Name</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Full Name</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
                   placeholder="e.g. Alex Johnson"
+                  placeholderTextColor={colors.textMuted}
                   value={name}
                   onChangeText={setName}
                   autoCapitalize="words"
                 />
 
-                <Text style={styles.inputLabel}>Phone (Optional)</Text>
+                <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Phone (Optional)</Text>
                 <TextInput
-                  style={styles.modalInput}
+                  style={[styles.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
                   placeholder="+1 (555) 000-0000"
+                  placeholderTextColor={colors.textMuted}
                   value={phone}
                   onChangeText={setPhone}
                   keyboardType="phone-pad"
@@ -715,20 +939,22 @@ export default function ProfileScreen() {
               </>
             )}
 
-            <Text style={styles.inputLabel}>Email Address</Text>
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Email Address</Text>
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
               placeholder="alex@example.com"
+              placeholderTextColor={colors.textMuted}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
             />
 
-            <Text style={styles.inputLabel}>Password</Text>
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Password</Text>
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
               placeholder="••••••••"
+              placeholderTextColor={colors.textMuted}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -781,20 +1007,20 @@ export default function ProfileScreen() {
           onPress={() => setAvatarModalVisible(false)}
         >
           <TouchableOpacity
-            style={[styles.modalContent, Shadows.lg]}
+            style={[styles.modalContent, { backgroundColor: colors.modalBg }, Shadows.lg]}
             activeOpacity={1}
             onPress={e => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
               <View>
-                <Text style={styles.modalTitle}>Change Profile Picture</Text>
-                <Text style={styles.modalSubTitle}>Choose a photo or select a stylish avatar</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>Change Profile Picture</Text>
+                <Text style={[styles.modalSubTitle, { color: colors.textSecondary }]}>Choose a photo or select a stylish avatar</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setAvatarModalVisible(false)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Ionicons name="close" size={24} color={Colors.light.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -814,7 +1040,7 @@ export default function ProfileScreen() {
             {/* Quick Upload Action Buttons */}
             <View style={styles.avatarActionsRow}>
               <TouchableOpacity
-                style={styles.avatarActionBtn}
+                style={[styles.avatarActionBtn, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF', borderColor: isDark ? '#334155' : '#BFDBFE' }]}
                 onPress={handlePickFromGallery}
                 activeOpacity={0.8}
               >
@@ -823,7 +1049,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.avatarActionBtn}
+                style={[styles.avatarActionBtn, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF', borderColor: isDark ? '#334155' : '#BFDBFE' }]}
                 onPress={handleTakePhoto}
                 activeOpacity={0.8}
               >
@@ -833,7 +1059,7 @@ export default function ProfileScreen() {
             </View>
 
             {/* Preset Avatars Grid */}
-            <Text style={styles.presetSectionTitle}>OR CHOOSE A PRESET AVATAR</Text>
+            <Text style={[styles.presetSectionTitle, { color: colors.textMuted }]}>OR CHOOSE A PRESET AVATAR</Text>
             <View style={styles.presetsGrid}>
               {PRESET_AVATARS.map(av => {
                 const isSelected = selectedAvatarUri === av.uri;
@@ -896,20 +1122,20 @@ export default function ProfileScreen() {
           onPress={() => setEditDetailsModalVisible(false)}
         >
           <TouchableOpacity
-            style={[styles.modalContent, Shadows.lg]}
+            style={[styles.modalContent, { backgroundColor: colors.modalBg }, Shadows.lg]}
             activeOpacity={1}
             onPress={e => e.stopPropagation()}
           >
             <View style={styles.modalHeader}>
               <View>
-                <Text style={styles.modalTitle}>Edit Profile Information</Text>
-                <Text style={styles.modalSubTitle}>Update your name, contact and delivery address</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>Edit Profile Information</Text>
+                <Text style={[styles.modalSubTitle, { color: colors.textSecondary }]}>Update your name, contact and delivery address</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setEditDetailsModalVisible(false)}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Ionicons name="close" size={24} color={Colors.light.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
@@ -922,94 +1148,94 @@ export default function ProfileScreen() {
 
             <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 380 }}>
               {/* Full Name */}
-              <Text style={styles.inputLabel}>FULL NAME</Text>
-              <View style={styles.inputWithIcon}>
-                <Ionicons name="person-outline" size={18} color={Colors.light.textMuted} style={styles.inputIcon} />
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>FULL NAME</Text>
+              <View style={[styles.inputWithIcon, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+                <Ionicons name="person-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.fieldInput}
+                  style={[styles.fieldInput, { color: colors.text }]}
                   value={editName}
                   onChangeText={setEditName}
                   placeholder="e.g. Alex Johnson"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
 
               {/* Email */}
-              <Text style={styles.inputLabel}>EMAIL ADDRESS</Text>
-              <View style={styles.inputWithIcon}>
-                <Ionicons name="mail-outline" size={18} color={Colors.light.textMuted} style={styles.inputIcon} />
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>EMAIL ADDRESS</Text>
+              <View style={[styles.inputWithIcon, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+                <Ionicons name="mail-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.fieldInput}
+                  style={[styles.fieldInput, { color: colors.text }]}
                   value={editEmail}
                   onChangeText={setEditEmail}
                   placeholder="e.g. alex@example.com"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
               </View>
 
               {/* Phone */}
-              <Text style={styles.inputLabel}>PHONE NUMBER</Text>
-              <View style={styles.inputWithIcon}>
-                <Ionicons name="call-outline" size={18} color={Colors.light.textMuted} style={styles.inputIcon} />
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PHONE NUMBER</Text>
+              <View style={[styles.inputWithIcon, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+                <Ionicons name="call-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.fieldInput}
+                  style={[styles.fieldInput, { color: colors.text }]}
                   value={editPhone}
                   onChangeText={setEditPhone}
                   placeholder="e.g. +234 803 123 4567"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="phone-pad"
                 />
               </View>
 
               {/* Delivery Street */}
-              <Text style={styles.inputLabel}>STREET ADDRESS</Text>
-              <View style={styles.inputWithIcon}>
-                <Ionicons name="home-outline" size={18} color={Colors.light.textMuted} style={styles.inputIcon} />
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>STREET ADDRESS</Text>
+              <View style={[styles.inputWithIcon, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+                <Ionicons name="home-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.fieldInput}
+                  style={[styles.fieldInput, { color: colors.text }]}
                   value={editStreet}
                   onChangeText={setEditStreet}
                   placeholder="e.g. 14 Admiralty Way, Lekki Phase 1"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textMuted}
                 />
               </View>
 
               {/* City & State Row */}
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.inputLabel}>CITY</Text>
-                  <View style={styles.inputWithIcon}>
-                    <Ionicons name="location-outline" size={18} color={Colors.light.textMuted} style={styles.inputIcon} />
+                  <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>CITY</Text>
+                  <View style={[styles.inputWithIcon, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+                    <Ionicons name="location-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
                     <TextInput
-                      style={styles.fieldInput}
+                      style={[styles.fieldInput, { color: colors.text }]}
                       value={editCity}
                       onChangeText={setEditCity}
                       placeholder="e.g. Lekki"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={colors.textMuted}
                     />
                   </View>
                 </View>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.inputLabel}>STATE</Text>
-                  <View style={styles.inputWithIcon}>
-                    <Ionicons name="map-outline" size={18} color={Colors.light.textMuted} style={styles.inputIcon} />
+                  <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>STATE</Text>
+                  <View style={[styles.inputWithIcon, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+                    <Ionicons name="map-outline" size={18} color={colors.textMuted} style={styles.inputIcon} />
                     <TextInput
-                      style={styles.fieldInput}
+                      style={[styles.fieldInput, { color: colors.text }]}
                       value={editState}
                       onChangeText={setEditState}
                       placeholder="e.g. Lagos State"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={colors.textMuted}
                     />
                   </View>
                 </View>
               </View>
               {/* Member Status note */}
               {user && (
-                <View style={styles.modalMemberBadge}>
+                <View style={[styles.modalMemberBadge, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
                   <Ionicons name="shield-checkmark" size={16} color="#10B981" />
-                  <Text style={styles.modalMemberText}>
+                  <Text style={[styles.modalMemberText, { color: colors.textSecondary }]}>
                     Verified Shopper • Member since {formatMemberDate(user.createdAt)}
                   </Text>
                 </View>
@@ -1591,5 +1817,63 @@ const styles = StyleSheet.create({
     height: 44,
     fontSize: 14,
     color: Colors.light.text,
+  },
+  themeFollowBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  themeFollowBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  themeOptionCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1.5,
+    marginBottom: 16,
+  },
+  themeOptionTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  themeOptionDesc: {
+    fontSize: 12,
+    marginTop: 4,
+    lineHeight: 16,
+  },
+  themeButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  themeModeBtn: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1.5,
+    gap: 6,
+  },
+  themeModeBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  themeStatusNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    gap: 8,
+    marginBottom: 8,
+  },
+  themeStatusText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 16,
   },
 });

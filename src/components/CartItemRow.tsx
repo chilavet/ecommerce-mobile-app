@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CartItem } from '../types';
 import { Colors, BorderRadius, Spacing } from '../constants/theme';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 import { formatNaira } from '../utils/currency';
 
 interface CartItemRowProps {
@@ -12,15 +13,16 @@ interface CartItemRowProps {
 
 export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   const { updateQuantity, removeFromCart } = useCart();
+  const { colors } = useTheme();
   const { product, quantity } = item;
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: product.imageUrl }} style={styles.image} resizeMode="cover" />
+    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Image source={{ uri: product.imageUrl }} style={[styles.image, { backgroundColor: colors.subCard }]} resizeMode="cover" />
 
       <View style={styles.content}>
         <View style={styles.topRow}>
-          <Text style={styles.brand}>{product.brand}</Text>
+          <Text style={[styles.brand, { color: colors.textSecondary }]}>{product.brand}</Text>
           <TouchableOpacity
             onPress={() => removeFromCart(product.id)}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
@@ -29,23 +31,23 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
           {product.title}
         </Text>
 
         <View style={styles.bottomRow}>
-          <Text style={styles.price}>{formatNaira(product.price * quantity)}</Text>
+          <Text style={[styles.price, { color: colors.primary }]}>{formatNaira(product.price * quantity)}</Text>
 
-          <View style={styles.stepper}>
+          <View style={[styles.stepper, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
             <TouchableOpacity
               onPress={() => updateQuantity(product.id, quantity - 1)}
               style={styles.stepperBtn}
               activeOpacity={0.7}
             >
-              <Ionicons name={quantity === 1 ? 'trash-outline' : 'remove'} size={14} color={quantity === 1 ? Colors.danger : Colors.light.text} />
+              <Ionicons name={quantity === 1 ? 'trash-outline' : 'remove'} size={14} color={quantity === 1 ? Colors.danger : colors.text} />
             </TouchableOpacity>
 
-            <Text style={styles.quantityText}>{quantity}</Text>
+            <Text style={[styles.quantityText, { color: colors.text }]}>{quantity}</Text>
 
             <TouchableOpacity
               onPress={() => updateQuantity(product.id, quantity + 1)}
@@ -56,7 +58,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
               <Ionicons
                 name="add"
                 size={14}
-                color={quantity >= product.stock ? Colors.light.textMuted : Colors.light.text}
+                color={quantity >= product.stock ? colors.textMuted : colors.text}
               />
             </TouchableOpacity>
           </View>

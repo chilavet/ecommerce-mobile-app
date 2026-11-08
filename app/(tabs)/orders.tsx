@@ -16,9 +16,11 @@ import { Order, OrderStatus } from '@/src/types';
 import { getOrders } from '@/src/database/db';
 import { OrderCard } from '@/src/components/OrderCard';
 import { useAuth } from '@/src/context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function OrdersScreen() {
   const { user } = useAuth();
+  const { colors, isDark } = useTheme();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<'all' | 'active' | 'delivered'>('all');
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,7 +76,7 @@ export default function OrdersScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -83,8 +85,8 @@ export default function OrdersScreen() {
       <View style={styles.header}>
         <View style={styles.headerRow}>
           <View>
-            <Text style={styles.title}>Order Progress &amp; History</Text>
-            <Text style={styles.subtitle}>
+            <Text style={[styles.title, { color: colors.text }]}>Order Progress &amp; History</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               Track package progress live from order placed till delivered
             </Text>
           </View>
@@ -97,25 +99,41 @@ export default function OrdersScreen() {
         {orders.length > 0 && (
           <View style={styles.filterRow}>
             <TouchableOpacity
-              style={[styles.filterChip, filter === 'all' && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.card, borderColor: colors.border },
+                filter === 'all' && styles.filterChipActive,
+              ]}
               onPress={() => setFilter('all')}
               activeOpacity={0.7}
             >
               <Text
-                style={[styles.filterChipText, filter === 'all' && styles.filterChipTextActive]}
+                style={[
+                  styles.filterChipText,
+                  { color: colors.textSecondary },
+                  filter === 'all' && styles.filterChipTextActive,
+                ]}
               >
                 All ({orders.length})
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.filterChip, filter === 'active' && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.card, borderColor: colors.border },
+                filter === 'active' && styles.filterChipActive,
+              ]}
               onPress={() => setFilter('active')}
               activeOpacity={0.7}
             >
               <View style={styles.activePillDot} />
               <Text
-                style={[styles.filterChipText, filter === 'active' && styles.filterChipTextActive]}
+                style={[
+                  styles.filterChipText,
+                  { color: colors.textSecondary },
+                  filter === 'active' && styles.filterChipTextActive,
+                ]}
               >
                 In Progress (
                 {
@@ -128,13 +146,18 @@ export default function OrdersScreen() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.filterChip, filter === 'delivered' && styles.filterChipActive]}
+              style={[
+                styles.filterChip,
+                { backgroundColor: colors.card, borderColor: colors.border },
+                filter === 'delivered' && styles.filterChipActive,
+              ]}
               onPress={() => setFilter('delivered')}
               activeOpacity={0.7}
             >
               <Text
                 style={[
                   styles.filterChipText,
+                  { color: colors.textSecondary },
                   filter === 'delivered' && styles.filterChipTextActive,
                 ]}
               >
@@ -148,13 +171,13 @@ export default function OrdersScreen() {
       {/* Orders List or Empty State */}
       {filteredOrders.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <View style={styles.emptyIconCircle}>
-            <Ionicons name="receipt-outline" size={54} color={Colors.primary} />
+          <View style={[styles.emptyIconCircle, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+            <Ionicons name="receipt-outline" size={54} color={colors.primary} />
           </View>
-          <Text style={styles.emptyTitle}>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>
             {filter === 'all' ? 'No orders placed yet' : `No ${filter} orders`}
           </Text>
-          <Text style={styles.emptySubtitle}>
+          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
             {filter === 'all'
               ? 'When you place an order, live progress tracking from dispatch to delivery appears here.'
               : 'Switch filter to "All" to review your complete purchase timeline.'}

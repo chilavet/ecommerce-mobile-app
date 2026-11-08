@@ -5,6 +5,7 @@ import { Order, OrderStatus } from '../types';
 import { Colors, BorderRadius, Spacing, Shadows } from '../constants/theme';
 import { formatNaira } from '../utils/currency';
 import { updateOrderStatus } from '../database/db';
+import { useTheme } from '../context/ThemeContext';
 
 interface OrderCardProps {
   order: Order;
@@ -56,6 +57,7 @@ const ORDER_STEPS: StepConfig[] = [
 ];
 
 export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) => {
+  const { colors, isDark } = useTheme();
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>(order.status);
   const [showItems, setShowItems] = useState(false);
 
@@ -97,32 +99,42 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
   const getBadgeColors = (status: OrderStatus) => {
     switch (status) {
       case 'delivered':
-        return { bg: '#DCFCE7', text: '#15803D', border: '#86EFAC' };
+        return isDark
+          ? { bg: '#064E3B', text: '#6EE7B7', border: '#047857' }
+          : { bg: '#DCFCE7', text: '#15803D', border: '#86EFAC' };
       case 'shipped':
-        return { bg: '#E0F2FE', text: '#0284C7', border: '#7DD3FC' };
+        return isDark
+          ? { bg: '#0C4A6E', text: '#7DD3FC', border: '#0284C7' }
+          : { bg: '#E0F2FE', text: '#0284C7', border: '#7DD3FC' };
       case 'processing':
-        return { bg: '#FEF3C7', text: '#D97706', border: '#FDE68A' };
+        return isDark
+          ? { bg: '#451A03', text: '#FCD34D', border: '#B45309' }
+          : { bg: '#FEF3C7', text: '#D97706', border: '#FDE68A' };
       case 'cancelled':
-        return { bg: '#FEE2E2', text: '#DC2626', border: '#FCA5A5' };
+        return isDark
+          ? { bg: '#450A0A', text: '#FCA5A5', border: '#B91C1C' }
+          : { bg: '#FEE2E2', text: '#DC2626', border: '#FCA5A5' };
       default:
-        return { bg: '#EFF6FF', text: Colors.primary, border: Colors.primaryLight };
+        return isDark
+          ? { bg: '#1E3A8A', text: '#93C5FD', border: '#2563EB' }
+          : { bg: '#EFF6FF', text: Colors.primary, border: Colors.primaryLight };
     }
   };
 
   const badgeTheme = getBadgeColors(currentStatus);
 
   return (
-    <View style={[styles.card, Shadows.sm]}>
+    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
       {/* 1. Header: Order ID, Date & Status Badge */}
       <View style={styles.header}>
         <View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <Text style={styles.orderNumber}>Order #{order.id.replace('ord_', '')}</Text>
+            <Text style={[styles.orderNumber, { color: colors.text }]}>Order #{order.id.replace('ord_', '')}</Text>
             <View style={styles.nigeriaTag}>
               <Text style={styles.nigeriaTagText}>🇳🇬 NG</Text>
             </View>
           </View>
-          <Text style={styles.date}>{formattedDate}</Text>
+          <Text style={[styles.date, { color: colors.textSecondary }]}>{formattedDate}</Text>
         </View>
 
         <View
@@ -283,7 +295,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
         </View>
       </View>
 
-      <View style={styles.divider} />
+      <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
       {/* 3. Items Summary & Expandable Toggle */}
       <View style={styles.itemsRow}>
@@ -292,7 +304,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
             <Image
               key={idx}
               source={{ uri: item.productImage }}
-              style={[styles.thumb, idx > 0 && { marginLeft: -12 }]}
+              style={[styles.thumb, { backgroundColor: colors.subCard, borderColor: colors.card }, idx > 0 && { marginLeft: -12 }]}
             />
           ))}
           {order.items.length > 3 && (
@@ -303,10 +315,10 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
         </View>
 
         <View style={styles.summaryText}>
-          <Text style={styles.itemsCount}>
+          <Text style={[styles.itemsCount, { color: colors.textSecondary }]}>
             {order.items.reduce((s, i) => s + i.quantity, 0)} {order.items.length === 1 ? 'item' : 'items'}
           </Text>
-          <Text style={styles.totalPrice}>{formatNaira(order.total)}</Text>
+          <Text style={[styles.totalPrice, { color: colors.text }]}>{formatNaira(order.total)}</Text>
         </View>
       </View>
 
@@ -316,31 +328,31 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, onStatusChange }) =
         onPress={() => setShowItems(!showItems)}
         activeOpacity={0.7}
       >
-        <Text style={styles.toggleItemsText}>
+        <Text style={[styles.toggleItemsText, { color: colors.primary }]}>
           {showItems ? 'Hide Items' : 'View Ordered Items'}
         </Text>
         <Ionicons
           name={showItems ? 'chevron-up' : 'chevron-down'}
           size={14}
-          color={Colors.primary}
+          color={colors.primary}
         />
       </TouchableOpacity>
 
       {/* Expanded Items List */}
       {showItems && (
-        <View style={styles.expandedItemsContainer}>
+        <View style={[styles.expandedItemsContainer, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
           {order.items.map(item => (
-            <View key={item.id} style={styles.expandedItemRow}>
+            <View key={item.id} style={[styles.expandedItemRow, { borderBottomColor: colors.border }]}>
               <Image source={{ uri: item.productImage }} style={styles.expandedItemImg} />
               <View style={{ flex: 1, marginLeft: 10 }}>
-                <Text style={styles.expandedItemTitle} numberOfLines={1}>
+                <Text style={[styles.expandedItemTitle, { color: colors.text }]} numberOfLines={1}>
                   {item.productTitle}
                 </Text>
-                <Text style={styles.expandedItemPrice}>
+                <Text style={[styles.expandedItemPrice, { color: colors.textSecondary }]}>
                   {item.quantity} × {formatNaira(item.unitPrice)}
                 </Text>
               </View>
-              <Text style={styles.expandedItemSubtotal}>
+              <Text style={[styles.expandedItemSubtotal, { color: colors.primary }]}>
                 {formatNaira(item.quantity * item.unitPrice)}
               </Text>
             </View>

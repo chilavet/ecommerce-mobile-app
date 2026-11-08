@@ -12,26 +12,38 @@ export const Colors = {
   light: {
     background: '#F8FAFC',
     card: '#FFFFFF',
+    cardSecondary: '#F1F5F9',
     text: '#0F172A',
     textSecondary: '#64748B',
     textMuted: '#94A3B8',
     border: '#E2E8F0',
     borderLight: '#F1F5F9',
     surface: '#FFFFFF',
-    inputBg: '#F1F5F9',
-    badge: '#F1F5F9',
+    inputBg: '#F8FAFC',
+    inputBorder: '#E2E8F0',
+    badge: '#EFF6FF',
+    subCard: '#F8FAFC',
+    divider: '#F1F5F9',
+    iconBg: '#EFF6FF',
+    modalBg: '#FFFFFF',
   },
   dark: {
     background: '#0B0F19',
     card: '#161F30',
+    cardSecondary: '#1E293B',
     text: '#F8FAFC',
     textSecondary: '#94A3B8',
     textMuted: '#64748B',
-    border: '#1E293B',
-    borderLight: '#1A2333',
+    border: '#26334D',
+    borderLight: '#1E293B',
     surface: '#161F30',
     inputBg: '#1E293B',
+    inputBorder: '#334155',
     badge: '#1E293B',
+    subCard: '#0B0F19',
+    divider: '#1E293B',
+    iconBg: '#1E293B',
+    modalBg: '#161F30',
   }
 };
 
@@ -75,4 +87,3 @@ export const Shadows = {
     elevation: 8,
   },
 };
-

@@ -14,12 +14,14 @@ import { router } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useWallet } from '@/src/context/WalletContext';
 import { useAuth } from '@/src/context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { PaystackModal, PaystackSuccessResponse } from '@/src/components/PaystackModal';
 import { formatNaira } from '@/src/utils/currency';
 import { WalletTransaction } from '@/src/types';
 
 export default function WalletScreen() {
   const { user } = useAuth();
+  const { colors, isDark } = useTheme();
   const { balance, currency, transactions, fundWallet } = useWallet();
 
   // Balance visibility toggle
@@ -75,7 +77,7 @@ export default function WalletScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.contentContainer}
       showsVerticalScrollIndicator={false}
     >
@@ -146,51 +148,51 @@ export default function WalletScreen() {
       {/* 3. Transactions List */}
       <View style={styles.transactionsHeaderRow}>
         <View>
-          <Text style={styles.transactionsTitle}>Transaction History</Text>
-          <Text style={styles.transactionsSubtitle}>All credits and checkout payments</Text>
+          <Text style={[styles.transactionsTitle, { color: colors.text }]}>Transaction History</Text>
+          <Text style={[styles.transactionsSubtitle, { color: colors.textSecondary }]}>All credits and checkout payments</Text>
         </View>
-        <View style={styles.countBadge}>
-          <Text style={styles.countBadgeText}>{filteredTransactions.length}</Text>
+        <View style={[styles.countBadge, { backgroundColor: colors.subCard }]}>
+          <Text style={[styles.countBadgeText, { color: colors.textSecondary }]}>{filteredTransactions.length}</Text>
         </View>
       </View>
 
       {/* Filter Tabs */}
-      <View style={styles.filterTabs}>
+      <View style={[styles.filterTabs, { backgroundColor: colors.subCard }]}>
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'all' && styles.filterTabActive]}
+          style={[styles.filterTab, filter === 'all' && [styles.filterTabActive, { backgroundColor: colors.card }]]}
           onPress={() => setFilter('all')}
         >
-          <Text style={[styles.filterTabText, filter === 'all' && styles.filterTabTextActive]}>
+          <Text style={[styles.filterTabText, { color: colors.textSecondary }, filter === 'all' && [styles.filterTabTextActive, { color: Colors.primary }]]}>
             All
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'credit' && styles.filterTabActive]}
+          style={[styles.filterTab, filter === 'credit' && [styles.filterTabActive, { backgroundColor: colors.card }]]}
           onPress={() => setFilter('credit')}
         >
-          <Text style={[styles.filterTabText, filter === 'credit' && styles.filterTabTextActive]}>
+          <Text style={[styles.filterTabText, { color: colors.textSecondary }, filter === 'credit' && [styles.filterTabTextActive, { color: Colors.primary }]]}>
             Deposits (+)
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.filterTab, filter === 'debit' && styles.filterTabActive]}
+          style={[styles.filterTab, filter === 'debit' && [styles.filterTabActive, { backgroundColor: colors.card }]]}
           onPress={() => setFilter('debit')}
         >
-          <Text style={[styles.filterTabText, filter === 'debit' && styles.filterTabTextActive]}>
+          <Text style={[styles.filterTabText, { color: colors.textSecondary }, filter === 'debit' && [styles.filterTabTextActive, { color: Colors.primary }]]}>
             Payments (-)
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Transactions Container */}
-      <View style={[styles.txListContainer, Shadows.sm]}>
+      <View style={[styles.txListContainer, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
         {filteredTransactions.length === 0 ? (
           <View style={styles.emptyTx}>
-            <Ionicons name="receipt-outline" size={40} color="#94A3B8" />
-            <Text style={styles.emptyTxTitle}>No Transactions Found</Text>
-            <Text style={styles.emptyTxSub}>
+            <Ionicons name="receipt-outline" size={40} color={colors.textMuted} />
+            <Text style={[styles.emptyTxTitle, { color: colors.text }]}>No Transactions Found</Text>
+            <Text style={[styles.emptyTxSub, { color: colors.textSecondary }]}>
               Transactions will appear here when you fund your wallet or place orders.
             </Text>
           </View>
@@ -200,6 +202,7 @@ export default function WalletScreen() {
               key={tx.id}
               style={[
                 styles.txItem,
+                { borderBottomColor: colors.divider },
                 idx === filteredTransactions.length - 1 && { borderBottomWidth: 0 },
               ]}
             >
@@ -217,12 +220,12 @@ export default function WalletScreen() {
               </View>
 
               <View style={{ flex: 1, marginRight: 8 }}>
-                <Text style={styles.txDesc} numberOfLines={1}>
+                <Text style={[styles.txDesc, { color: colors.text }]} numberOfLines={1}>
                   {tx.description.replace(/via Paystack/gi, '(Card Deposit)').replace(/Paystack/gi, 'Card')}
                 </Text>
                 <View style={styles.txMetaRow}>
-                  <View style={styles.channelPill}>
-                    <Text style={styles.channelPillText}>
+                  <View style={[styles.channelPill, { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' }]}>
+                    <Text style={[styles.channelPillText, { color: colors.textSecondary }]}>
                       {tx.channel === 'paystack'
                         ? 'Card Deposit'
                         : tx.channel === 'checkout'
@@ -230,7 +233,7 @@ export default function WalletScreen() {
                         : 'Bonus'}
                     </Text>
                   </View>
-                  <Text style={styles.txDate}>
+                  <Text style={[styles.txDate, { color: colors.textMuted }]}>
                     {new Date(tx.createdAt).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -249,7 +252,7 @@ export default function WalletScreen() {
                   {tx.type === 'credit' ? '+' : '-'}
                   {formatNaira(tx.amount)}
                 </Text>
-                <View style={styles.txStatusPill}>
+                <View style={[styles.txStatusPill, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
                   <Ionicons name="checkmark-circle" size={10} color="#10B981" />
                   <Text style={styles.txStatusText}>Completed</Text>
                 </View>
@@ -273,31 +276,32 @@ export default function WalletScreen() {
         >
           <TouchableOpacity
             activeOpacity={1}
-            style={[styles.fundModalCard, Shadows.lg]}
+            style={[styles.fundModalCard, { backgroundColor: colors.modalBg }, Shadows.lg]}
             onPress={e => e.stopPropagation()}
           >
             <View style={styles.fundModalHeader}>
               <View>
-                <Text style={styles.fundModalTitle}>Fund Digital Wallet</Text>
-                <Text style={styles.fundModalSub}>Secure Payment Gateway</Text>
+                <Text style={[styles.fundModalTitle, { color: colors.text }]}>Fund Digital Wallet</Text>
+                <Text style={[styles.fundModalSub, { color: colors.textSecondary }]}>Secure Payment Gateway</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setFundModalVisible(false)}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               >
-                <Ionicons name="close" size={24} color={Colors.light.text} />
+                <Ionicons name="close" size={24} color={colors.text} />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.inputLabel}>ENTER AMOUNT TO DEPOSIT (₦)</Text>
-            <View style={styles.amountInputWrapper}>
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>ENTER AMOUNT TO DEPOSIT (₦)</Text>
+            <View style={[styles.amountInputWrapper, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
               <Text style={styles.currencyPrefix}>{currency}</Text>
               <TextInput
-                style={styles.amountInput}
+                style={[styles.amountInput, { color: colors.text }]}
                 value={topUpAmount}
                 onChangeText={setTopUpAmount}
                 keyboardType="numeric"
                 placeholder="10000"
+                placeholderTextColor={colors.textMuted}
                 autoFocus
               />
             </View>

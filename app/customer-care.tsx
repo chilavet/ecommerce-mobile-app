@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { Colors, Spacing, BorderRadius, Shadows } from '../src/constants/theme';
 import { useAuth } from '../src/context/AuthContext';
+import { useTheme } from '../src/context/ThemeContext';
 import { createSupportTicket, getSupportTickets, getOrders } from '../src/database/db';
 import { SupportTicket, Order } from '../src/types';
 
@@ -104,6 +105,7 @@ const COMPLAINT_CATEGORIES = [
 
 export default function CustomerCareScreen() {
   const { user } = useAuth();
+  const { colors, isDark } = useTheme();
 
   // Active Screen Tab: 'complaint' | 'faqs' | 'tickets'
   const [activeTab, setActiveTab] = useState<'complaint' | 'faqs' | 'tickets'>('complaint');
@@ -283,7 +285,7 @@ export default function CustomerCareScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView

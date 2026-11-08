@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Spacing, BorderRadius, Shadows } from '../constants/theme';
 import { useLocation } from '../context/LocationContext';
+import { useTheme } from '../context/ThemeContext';
 
 interface LocationPickerModalProps {
   visible: boolean;
@@ -23,6 +24,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   visible,
   onClose,
 }) => {
+  const { colors, isDark } = useTheme();
   const {
     currentLocation,
     loadingLocation,
@@ -61,12 +63,12 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={styles.sheetContainer}>
+        <View style={[styles.sheetContainer, { backgroundColor: colors.modalBg }]}>
           {/* Header */}
-          <View style={styles.header}>
+          <View style={[styles.header, { borderBottomColor: colors.border }]}>
             <View>
-              <Text style={styles.title}>Delivery Area</Text>
-              <Text style={styles.subtitle}>
+              <Text style={[styles.title, { color: colors.text }]}>Delivery Area</Text>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
                 Select your area or state in Nigeria
               </Text>
             </View>
@@ -75,7 +77,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
               onPress={onClose}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="close" size={24} color={Colors.light.text} />
+              <Ionicons name="close" size={24} color={colors.text} />
             </TouchableOpacity>
           </View>
 
@@ -85,13 +87,13 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             showsVerticalScrollIndicator={false}
           >
             {/* Current Selected Delivery Area */}
-            <View style={styles.currentAreaCard}>
-              <View style={styles.currentAreaIconCircle}>
+            <View style={[styles.currentAreaCard, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
+              <View style={[styles.currentAreaIconCircle, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
                 <Ionicons name="location" size={18} color={Colors.primary} />
               </View>
               <View style={styles.currentAreaContent}>
-                <Text style={styles.currentAreaLabel}>SELECTED AREA</Text>
-                <Text style={styles.currentAreaText} numberOfLines={1}>
+                <Text style={[styles.currentAreaLabel, { color: colors.textMuted }]}>SELECTED AREA</Text>
+                <Text style={[styles.currentAreaText, { color: colors.text }]} numberOfLines={1}>
                   {currentLocation.formattedAddress || currentLocation.name}
                 </Text>
               </View>
@@ -100,7 +102,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
             {/* GPS Auto-detect Button */}
             <TouchableOpacity
-              style={[styles.gpsCard, Shadows.sm]}
+              style={[styles.gpsCard, { backgroundColor: colors.subCard, borderColor: colors.border }, Shadows.sm]}
               onPress={handleUseGPS}
               disabled={loadingLocation}
               activeOpacity={0.8}
@@ -113,8 +115,8 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
                 )}
               </View>
               <View style={styles.gpsContent}>
-                <Text style={styles.gpsTitle}>Use Current Location (GPS)</Text>
-                <Text style={styles.gpsSubtitle}>
+                <Text style={[styles.gpsTitle, { color: colors.text }]}>Use Current Location (GPS)</Text>
+                <Text style={[styles.gpsSubtitle, { color: colors.textSecondary }]}>
                   Auto-detect your current state and city in Nigeria
                 </Text>
               </View>
@@ -123,18 +125,18 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
 
             {/* Custom Address Input */}
             <View style={styles.inputSection}>
-              <Text style={styles.sectionLabel}>ENTER AREA OR CITY</Text>
-              <View style={styles.inputRow}>
+              <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>ENTER AREA OR CITY</Text>
+              <View style={[styles.inputRow, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
                 <Ionicons
                   name="location-outline"
                   size={20}
-                  color={Colors.light.textMuted}
+                  color={colors.textMuted}
                   style={styles.inputIcon}
                 />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="e.g. Surulere, Lagos or Garki, Abuja"
-                  placeholderTextColor={Colors.light.textMuted}
+                  placeholderTextColor={colors.textMuted}
                   value={customInput}
                   onChangeText={setCustomInput}
                   returnKeyType="done"

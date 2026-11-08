@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Category } from '../types';
 import { Colors, BorderRadius, Spacing } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface CategoryPillProps {
   category: Category;
@@ -11,18 +12,30 @@ interface CategoryPillProps {
 }
 
 export const CategoryPill: React.FC<CategoryPillProps> = ({ category, isSelected, onSelect }) => {
+  const { colors } = useTheme();
+
   return (
     <TouchableOpacity
       onPress={onSelect}
-      style={[styles.pill, isSelected ? styles.activePill : styles.inactivePill]}
+      style={[
+        styles.pill,
+        isSelected
+          ? styles.activePill
+          : [styles.inactivePill, { backgroundColor: colors.card, borderColor: colors.border }],
+      ]}
       activeOpacity={0.7}
     >
       <Ionicons
         name={category.icon as any}
         size={16}
-        color={isSelected ? '#FFFFFF' : Colors.light.textSecondary}
+        color={isSelected ? '#FFFFFF' : colors.textSecondary}
       />
-      <Text style={[styles.text, isSelected ? styles.activeText : styles.inactiveText]}>
+      <Text
+        style={[
+          styles.text,
+          isSelected ? styles.activeText : [styles.inactiveText, { color: colors.textSecondary }],
+        ]}
+      >
         {category.name}
       </Text>
     </TouchableOpacity>

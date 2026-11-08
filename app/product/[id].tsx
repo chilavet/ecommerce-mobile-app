@@ -17,11 +17,13 @@ import { Product } from '@/src/types';
 import { getProductById } from '@/src/database/db';
 import { useCart } from '@/src/context/CartContext';
 import { useLocation } from '@/src/context/LocationContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { openGoogleMaps, openGoogleMapsDirections, getDeliveryEstimate } from '@/src/utils/location';
 import { formatNaira } from '@/src/utils/currency';
 
 export default function ProductDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { colors, isDark } = useTheme();
   const { addToCart } = useCart();
   const { currentLocation, enrichProductWithDistance } = useLocation();
 
@@ -92,13 +94,13 @@ export default function ProductDetailScreen() {
   const imagesList = product.images && product.images.length > 0 ? product.images : [product.imageUrl];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
           title: product.brand,
           headerRight: () => (
             <TouchableOpacity onPress={() => router.push('/(tabs)/cart')} style={{ marginRight: 8 }}>
-              <Ionicons name="cart-outline" size={24} color={Colors.light.text} />
+              <Ionicons name="cart-outline" size={24} color={colors.text} />
             </TouchableOpacity>
           ),
         }}
@@ -128,6 +130,7 @@ export default function ProductDetailScreen() {
                 onPress={() => setSelectedImage(img)}
                 style={[
                   styles.thumbnailWrapper,
+                  { borderColor: colors.border },
                   selectedImage === img && styles.thumbnailActive,
                 ]}
               >
@@ -138,7 +141,7 @@ export default function ProductDetailScreen() {
         )}
 
         {/* Details Container */}
-        <View style={styles.detailsContainer}>
+        <View style={[styles.detailsContainer, { backgroundColor: colors.card, borderTopColor: colors.border }]}>
           {/* Brand & Stock */}
           <View style={styles.topRow}>
             <Text style={styles.brandText}>{product.brand}</Text>
@@ -149,62 +152,41 @@ export default function ProductDetailScreen() {
           </View>
 
           {/* Title */}
-          <Text style={styles.productTitle}>{product.title}</Text>
+          <Text style={[styles.productTitle, { color: colors.text }]}>{product.title}</Text>
 
           {/* Rating */}
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={16} color={Colors.accent} />
-            <Text style={styles.ratingNumber}>{product.rating.toFixed(1)}</Text>
-            <Text style={styles.reviewCount}>({product.reviewsCount} verified reviews)</Text>
+            <Text style={[styles.ratingNumber, { color: colors.text }]}>{product.rating.toFixed(1)}</Text>
+            <Text style={[styles.reviewCount, { color: colors.textSecondary }]}>({product.reviewsCount} verified reviews)</Text>
           </View>
 
           {/* Price Box */}
           <View style={styles.priceContainer}>
             <Text style={styles.currentPrice}>{formatNaira(product.price)}</Text>
             {product.originalPrice && (
-              <Text style={styles.oldPrice}>{formatNaira(product.originalPrice)}</Text>
+              <Text style={[styles.oldPrice, { color: colors.textMuted }]}>{formatNaira(product.originalPrice)}</Text>
             )}
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
           {/* Description */}
-          <Text style={styles.sectionHeader}>Overview</Text>
-          <Text style={styles.descriptionText}>{product.description}</Text>
-
-          {/* Specifications */}
-          {product.specs && Object.keys(product.specs).length > 0 && (
-            <View style={styles.specsSection}>
-              <Text style={styles.sectionHeader}>Specifications</Text>
-              <View style={styles.specsTable}>
-                {Object.entries(product.specs).map(([key, val], idx) => (
-                  <View
-                    key={key}
-                    style={[
-                      styles.specRow,
-                      idx % 2 === 0 ? styles.specRowEven : styles.specRowOdd,
-                    ]}
-                  >
-                    <Text style={styles.specKey}>{key}</Text>
-                    <Text style={styles.specValue}>{val}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          )}
+          <Text style={[styles.sectionHeader, { color: colors.text }]}>Overview</Text>
+          <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>{product.description}</Text>
 
           {/* Store Location & Google Maps Connection */}
           {product.location && (
             <View style={styles.locationSection}>
-              <Text style={styles.sectionHeader}>Store &amp; Warehouse Location</Text>
-              <View style={[styles.locationCard, Shadows.sm]}>
+              <Text style={[styles.sectionHeader, { color: colors.text }]}>Store &amp; Warehouse Location</Text>
+              <View style={[styles.locationCard, { backgroundColor: colors.subCard, borderColor: colors.border }, Shadows.sm]}>
                 <View style={styles.locationCardHeader}>
-                  <View style={styles.storeIconCircle}>
+                  <View style={[styles.storeIconCircle, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
                     <Ionicons name="storefront" size={20} color={Colors.primary} />
                   </View>
                   <View style={styles.storeHeaderInfo}>
-                    <Text style={styles.storeName}>{product.location.name}</Text>
-                    <Text style={styles.storeAddress}>
+                    <Text style={[styles.storeName, { color: colors.text }]}>{product.location.name}</Text>
+                    <Text style={[styles.storeAddress, { color: colors.textSecondary }]}>
                       {product.location.address}, {product.location.city}, {product.location.state} {product.location.postalCode}
                     </Text>
                   </View>
@@ -212,7 +194,7 @@ export default function ProductDetailScreen() {
 
                 {/* Distance Badge & Delivery Speed */}
                 <View style={styles.distanceInfoRow}>
-                  <View style={styles.distancePill}>
+                  <View style={[styles.distancePill, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
                     <Ionicons name="location-sharp" size={14} color={Colors.primary} />
                     <Text style={styles.distancePillText}>
                       {product.distanceMiles !== undefined
@@ -257,7 +239,7 @@ export default function ProductDetailScreen() {
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={styles.directionsBtn}
+                    style={[styles.directionsBtn, { backgroundColor: isDark ? '#1E293B' : '#FFFFFF', borderColor: isDark ? '#334155' : '#E2E8F0' }]}
                     onPress={() =>
                       openGoogleMapsDirections(
                         product.location!.latitude,
@@ -277,20 +259,20 @@ export default function ProductDetailScreen() {
 
           {/* Quantity Selector */}
           <View style={styles.quantitySection}>
-            <Text style={styles.sectionHeader}>Quantity</Text>
-            <View style={styles.quantityPicker}>
+            <Text style={[styles.sectionHeader, { color: colors.text }]}>Quantity</Text>
+            <View style={[styles.quantityPicker, { backgroundColor: colors.subCard, borderColor: colors.border }]}>
               <TouchableOpacity
                 onPress={() => setQuantity(Math.max(1, quantity - 1))}
                 style={styles.quantityBtn}
               >
-                <Ionicons name="remove" size={18} color={Colors.light.text} />
+                <Ionicons name="remove" size={18} color={colors.text} />
               </TouchableOpacity>
-              <Text style={styles.quantityValue}>{quantity}</Text>
+              <Text style={[styles.quantityValue, { color: colors.text }]}>{quantity}</Text>
               <TouchableOpacity
                 onPress={() => setQuantity(Math.min(product.stock, quantity + 1))}
                 style={styles.quantityBtn}
               >
-                <Ionicons name="add" size={18} color={Colors.light.text} />
+                <Ionicons name="add" size={18} color={colors.text} />
               </TouchableOpacity>
             </View>
           </View>
@@ -306,9 +288,9 @@ export default function ProductDetailScreen() {
       )}
 
       {/* Sticky Bottom Actions */}
-      <View style={[styles.bottomBar, Shadows.lg]}>
+      <View style={[styles.bottomBar, { backgroundColor: colors.card, borderTopColor: colors.border }, Shadows.lg]}>
         <TouchableOpacity
-          style={styles.addToCartBtn}
+          style={[styles.addToCartBtn, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF', borderColor: Colors.primary }]}
           onPress={handleAddToCart}
           activeOpacity={0.8}
         >

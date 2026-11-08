@@ -17,9 +17,11 @@ import { StatusBar } from 'expo-status-bar';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useAuth } from '@/src/context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function LoginScreen() {
   const { user, login, isLoading: authLoading } = useAuth();
+  const { colors, isDark } = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -77,12 +79,12 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <StatusBar style="dark" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { backgroundColor: colors.background }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -93,27 +95,27 @@ export default function LoginScreen() {
             <View style={styles.pulseDot} />
           </View>
 
-          <Text style={styles.brandTitle}>ShopPulse</Text>
-          <Text style={styles.brandSubtitle}>
+          <Text style={[styles.brandTitle, { color: colors.text }]}>ShopPulse</Text>
+          <Text style={[styles.brandSubtitle, { color: colors.textSecondary }]}>
             Fast, simple, and secure mobile shopping
           </Text>
         </View>
 
         {/* Sign In Form Card */}
-        <View style={[styles.card, Shadows.md]}>
-          <Text style={styles.cardHeaderTitle}>Sign In to Your Account</Text>
-          <Text style={styles.cardHeaderSubtitle}>
+        <View style={[styles.card, Shadows.md, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <Text style={[styles.cardHeaderTitle, { color: colors.text }]}>Sign In to Your Account</Text>
+          <Text style={[styles.cardHeaderSubtitle, { color: colors.textSecondary }]}>
             Welcome back! Enter your login credentials below.
           </Text>
 
           {/* Email Input */}
-          <Text style={styles.inputLabel}>EMAIL ADDRESS</Text>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="mail-outline" size={20} color={Colors.light.textSecondary} style={styles.inputIcon} />
+          <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>EMAIL ADDRESS</Text>
+          <View style={[styles.inputWrapper, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+            <Ionicons name="mail-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, { color: colors.text }]}
               placeholder="e.g. alex@example.com"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -122,24 +124,24 @@ export default function LoginScreen() {
             />
             {email.length > 0 && (
               <TouchableOpacity onPress={() => setEmail('')}>
-                <Ionicons name="close-circle" size={18} color="#94A3B8" />
+                <Ionicons name="close-circle" size={18} color={colors.textMuted} />
               </TouchableOpacity>
             )}
           </View>
 
           {/* Password Input */}
           <View style={styles.passwordLabelRow}>
-            <Text style={styles.inputLabel}>PASSWORD</Text>
+            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PASSWORD</Text>
             <TouchableOpacity onPress={handleQuickDemoFill}>
               <Text style={styles.demoLinkText}>Use Demo Login</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.inputWrapper}>
-            <Ionicons name="lock-closed-outline" size={20} color={Colors.light.textSecondary} style={styles.inputIcon} />
+          <View style={[styles.inputWrapper, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder }]}>
+            <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, { color: colors.text }]}
               placeholder="••••••••••••"
-              placeholderTextColor="#94A3B8"
+              placeholderTextColor={isDark ? '#64748B' : '#94A3B8'}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -153,7 +155,7 @@ export default function LoginScreen() {
               <Ionicons
                 name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                 size={20}
-                color={Colors.light.textSecondary}
+                color={colors.textSecondary}
               />
             </TouchableOpacity>
           </View>
@@ -176,20 +178,23 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>QUICK DEMO</Text>
-            <View style={styles.dividerLine} />
+            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
+            <Text style={[styles.dividerText, { color: colors.textMuted }]}>QUICK DEMO</Text>
+            <View style={[styles.dividerLine, { backgroundColor: colors.divider }]} />
           </View>
 
           {/* 1-Tap Demo Access */}
           <TouchableOpacity
-            style={styles.demoQuickButton}
+            style={[
+              styles.demoQuickButton,
+              isDark && { backgroundColor: '#064E3B', borderColor: '#047857' }
+            ]}
             onPress={handleInstantDemoLogin}
             disabled={isSubmitting}
             activeOpacity={0.8}
           >
-            <Ionicons name="flash" size={18} color="#059669" />
-            <Text style={styles.demoQuickButtonText}>
+            <Ionicons name="flash" size={18} color={isDark ? '#34D399' : '#059669'} />
+            <Text style={[styles.demoQuickButtonText, isDark && { color: '#6EE7B7' }]}>
               1-Tap Demo Access (Alex Johnson)
             </Text>
           </TouchableOpacity>
@@ -198,7 +203,7 @@ export default function LoginScreen() {
         {/* Security Footer */}
         <View style={styles.footerSecurity}>
           <Ionicons name="shield-checkmark" size={16} color="#059669" />
-          <Text style={styles.footerSecurityText}>
+          <Text style={[styles.footerSecurityText, { color: colors.textMuted }]}>
             256-bit SSL Security • Encrypted Login
           </Text>
         </View>

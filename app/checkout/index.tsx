@@ -17,6 +17,7 @@ import { useCart } from '@/src/context/CartContext';
 import { useAuth } from '@/src/context/AuthContext';
 import { useNotifications } from '@/src/context/NotificationContext';
 import { useWallet } from '@/src/context/WalletContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { PaystackModal, PaystackSuccessResponse } from '@/src/components/PaystackModal';
 import { createOrder } from '@/src/database/db';
 import { formatNaira } from '@/src/utils/currency';
@@ -25,6 +26,7 @@ type PaymentType = 'wallet' | 'card';
 
 export default function CheckoutScreen() {
   const { user } = useAuth();
+  const { colors, isDark } = useTheme();
   const { items, subtotal, shippingFee, discount, total, clearCart } = useCart();
   const { sendOrderConfirmation } = useNotifications();
 
@@ -138,14 +140,14 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Payment Method Selection: Wallet or Card ONLY */}
-        <View style={[styles.card, Shadows.sm]}>
+        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
           <View style={styles.sectionHeader}>
             <View style={styles.headerLeft}>
               <Ionicons name="card" size={20} color={Colors.primary} />
-              <Text style={styles.sectionTitle}>Payment Method</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Payment Method</Text>
             </View>
           </View>
 
@@ -153,6 +155,7 @@ export default function CheckoutScreen() {
           <TouchableOpacity
             style={[
               styles.paymentOption,
+              { backgroundColor: colors.subCard, borderColor: colors.border },
               paymentMethod === 'wallet' && styles.paymentOptionSelected,
             ]}
             onPress={() => setPaymentMethod('wallet')}
@@ -161,21 +164,21 @@ export default function CheckoutScreen() {
             <Ionicons
               name={paymentMethod === 'wallet' ? 'radio-button-on' : 'radio-button-off'}
               size={20}
-              color={paymentMethod === 'wallet' ? Colors.primary : Colors.light.textMuted}
+              color={paymentMethod === 'wallet' ? Colors.primary : colors.textMuted}
             />
-            <View style={[styles.methodIconBox, { backgroundColor: '#ECFDF5' }]}>
+            <View style={[styles.methodIconBox, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5' }]}>
               <Ionicons name="wallet" size={18} color="#10B981" />
             </View>
             <View style={{ flex: 1, marginLeft: 8 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                <Text style={styles.methodTitle}>Digital Wallet</Text>
+                <Text style={[styles.methodTitle, { color: colors.text }]}>Digital Wallet</Text>
                 <View style={hasSufficientBalance(total) ? styles.sufficientBadge : styles.insufficientBadge}>
                   <Text style={hasSufficientBalance(total) ? styles.sufficientBadgeText : styles.insufficientBadgeText}>
                     {hasSufficientBalance(total) ? 'Ready' : 'Low Balance'}
                   </Text>
                 </View>
               </View>
-              <Text style={styles.methodSubtitle}>
+              <Text style={[styles.methodSubtitle, { color: colors.textSecondary }]}>
                 Balance: {formatNaira(balance)} • {hasSufficientBalance(total) ? '1-tap instant pay' : `${formatNaira(total - balance)} needed`}
               </Text>
             </View>
@@ -192,6 +195,7 @@ export default function CheckoutScreen() {
           <TouchableOpacity
             style={[
               styles.paymentOption,
+              { backgroundColor: colors.subCard, borderColor: colors.border },
               paymentMethod === 'card' && styles.paymentOptionSelected,
             ]}
             onPress={() => setPaymentMethod('card')}
@@ -200,14 +204,14 @@ export default function CheckoutScreen() {
             <Ionicons
               name={paymentMethod === 'card' ? 'radio-button-on' : 'radio-button-off'}
               size={20}
-              color={paymentMethod === 'card' ? Colors.primary : Colors.light.textMuted}
+              color={paymentMethod === 'card' ? Colors.primary : colors.textMuted}
             />
-            <View style={[styles.methodIconBox, { backgroundColor: '#E0F2FE' }]}>
+            <View style={[styles.methodIconBox, { backgroundColor: isDark ? '#0C4A6E' : '#E0F2FE' }]}>
               <Ionicons name="card-outline" size={18} color="#0BA4DB" />
             </View>
             <View style={{ flex: 1, marginLeft: 8 }}>
-              <Text style={styles.methodTitle}>Pay with Card</Text>
-              <Text style={styles.methodSubtitle}>Mastercard, Visa, Verve (Instant)</Text>
+              <Text style={[styles.methodTitle, { color: colors.text }]}>Pay with Card</Text>
+              <Text style={[styles.methodSubtitle, { color: colors.textSecondary }]}>Mastercard, Visa, Verve (Instant)</Text>
             </View>
             <View style={styles.secureBadge}>
               <Ionicons name="shield-checkmark" size={13} color="#0BA4DB" />
@@ -217,12 +221,12 @@ export default function CheckoutScreen() {
         </View>
 
         {/* Order Review Summary */}
-        <View style={[styles.card, Shadows.sm]}>
-          <Text style={styles.sectionTitle}>Order Breakdown</Text>
+        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Order Breakdown</Text>
 
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Items ({items.length})</Text>
-            <Text style={styles.summaryValue}>{formatNaira(subtotal)}</Text>
+            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Items ({items.length})</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>{formatNaira(subtotal)}</Text>
           </View>
 
           {discount > 0 && (
@@ -235,26 +239,26 @@ export default function CheckoutScreen() {
           )}
 
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Shipping</Text>
-            <Text style={styles.summaryValue}>
+            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Shipping</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>
               {shippingFee === 0 ? 'FREE' : formatNaira(shippingFee)}
             </Text>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
           <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>Total Due</Text>
-            <Text style={styles.totalValue}>{formatNaira(total)}</Text>
+            <Text style={[styles.totalLabel, { color: colors.text }]}>Total Due</Text>
+            <Text style={[styles.totalValue, { color: colors.text }]}>{formatNaira(total)}</Text>
           </View>
         </View>
       </ScrollView>
 
       {/* Sticky Bottom Place Order Button */}
-      <View style={[styles.bottomBar, Shadows.lg]}>
+      <View style={[styles.bottomBar, { backgroundColor: colors.card, borderTopColor: colors.border }, Shadows.lg]}>
         <View>
-          <Text style={styles.bottomTotalLabel}>Total</Text>
-          <Text style={styles.bottomTotalValue}>{formatNaira(total)}</Text>
+          <Text style={[styles.bottomTotalLabel, { color: colors.textSecondary }]}>Total</Text>
+          <Text style={[styles.bottomTotalValue, { color: colors.text }]}>{formatNaira(total)}</Text>
         </View>
 
         <TouchableOpacity

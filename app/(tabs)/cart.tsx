@@ -13,10 +13,12 @@ import { router } from 'expo-router';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useCart } from '@/src/context/CartContext';
+import { useTheme } from '@/src/context/ThemeContext';
 import { CartItemRow } from '@/src/components/CartItemRow';
 import { formatNaira } from '@/src/utils/currency';
 
 export default function CartScreen() {
+  const { colors, isDark } = useTheme();
   const {
     items,
     clearCart,
@@ -57,12 +59,12 @@ export default function CartScreen() {
 
   if (items.length === 0) {
     return (
-      <View style={styles.emptyContainer}>
-        <View style={styles.emptyIconCircle}>
-          <Ionicons name="cart-outline" size={60} color={Colors.primary} />
+      <View style={[styles.emptyContainer, { backgroundColor: colors.background }]}>
+        <View style={[styles.emptyIconCircle, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+          <Ionicons name="cart-outline" size={60} color={colors.primary} />
         </View>
-        <Text style={styles.emptyTitle}>Your cart is empty</Text>
-        <Text style={styles.emptySubtitle}>
+        <Text style={[styles.emptyTitle, { color: colors.text }]}>Your cart is empty</Text>
+        <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
           Looks like you haven't added any products to your bag yet.
         </Text>
         <TouchableOpacity
@@ -77,14 +79,14 @@ export default function CartScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {/* Top summary row */}
         <View style={styles.topBar}>
-          <Text style={styles.itemsCountText}>{items.length} unique items</Text>
+          <Text style={[styles.itemsCountText, { color: colors.textSecondary }]}>{items.length} unique items</Text>
           <TouchableOpacity onPress={handleClearCart}>
             <Text style={styles.clearAllText}>Clear All</Text>
           </TouchableOpacity>
@@ -96,15 +98,15 @@ export default function CartScreen() {
         ))}
 
         {/* Promo Code Box */}
-        <View style={[styles.promoBox, Shadows.sm]}>
-          <Text style={styles.boxTitle}>Have a coupon?</Text>
+        <View style={[styles.promoBox, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
+          <Text style={[styles.boxTitle, { color: colors.text }]}>Have a coupon?</Text>
 
           {appliedPromo ? (
-            <View style={styles.appliedPromoBadge}>
+            <View style={[styles.appliedPromoBadge, isDark && { backgroundColor: '#064E3B' }]}>
               <View style={styles.appliedPromoInfo}>
-                <Ionicons name="pricetag" size={16} color={Colors.success} />
-                <Text style={styles.appliedPromoCode}>{appliedPromo.code}</Text>
-                <Text style={styles.appliedPromoDiscount}>
+                <Ionicons name="pricetag" size={16} color={isDark ? '#6EE7B7' : Colors.success} />
+                <Text style={[styles.appliedPromoCode, isDark && { color: '#6EE7B7' }]}>{appliedPromo.code}</Text>
+                <Text style={[styles.appliedPromoDiscount, isDark && { color: '#A7F3D0' }]}>
                   (-{appliedPromo.discountPercentage}%)
                 </Text>
               </View>
@@ -115,9 +117,9 @@ export default function CartScreen() {
           ) : (
             <View style={styles.promoInputRow}>
               <TextInput
-                style={styles.promoInput}
+                style={[styles.promoInput, { backgroundColor: colors.inputBg, borderColor: colors.inputBorder, color: colors.text }]}
                 placeholder="Enter promo code (e.g. SAVE20)"
-                placeholderTextColor={Colors.light.textMuted}
+                placeholderTextColor={colors.textMuted}
                 value={promoInput}
                 onChangeText={text => {
                   setPromoInput(text);
@@ -148,12 +150,12 @@ export default function CartScreen() {
         </View>
 
         {/* Order Summary Calculation */}
-        <View style={[styles.summaryCard, Shadows.sm]}>
-          <Text style={styles.boxTitle}>Order Summary</Text>
+        <View style={[styles.summaryCard, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
+          <Text style={[styles.boxTitle, { color: colors.text }]}>Order Summary</Text>
 
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>Subtotal</Text>
-            <Text style={styles.summaryValue}>{formatNaira(subtotal)}</Text>
+            <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Subtotal</Text>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>{formatNaira(subtotal)}</Text>
           </View>
 
           {discount > 0 && (
@@ -167,38 +169,38 @@ export default function CartScreen() {
 
           <View style={styles.summaryRow}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={styles.summaryLabel}>Delivery</Text>
+              <Text style={[styles.summaryLabel, { color: colors.textSecondary }]}>Delivery</Text>
               {shippingFee === 0 && (
                 <View style={styles.freeBadge}>
                   <Text style={styles.freeBadgeText}>FREE</Text>
                 </View>
               )}
             </View>
-            <Text style={styles.summaryValue}>
+            <Text style={[styles.summaryValue, { color: colors.text }]}>
               {shippingFee === 0 ? 'FREE' : formatNaira(shippingFee)}
             </Text>
           </View>
 
           {shippingFee > 0 && (
-            <Text style={styles.shippingHint}>
+            <Text style={[styles.shippingHint, { color: colors.primary }]}>
               Add {formatNaira(100000 - subtotal)} more for FREE shipping!
             </Text>
           )}
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
           <View style={styles.summaryRow}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>{formatNaira(total)}</Text>
+            <Text style={[styles.totalLabel, { color: colors.text }]}>Total</Text>
+            <Text style={[styles.totalValue, { color: colors.primary }]}>{formatNaira(total)}</Text>
           </View>
         </View>
       </ScrollView>
 
       {/* Sticky Bottom Action */}
-      <View style={[styles.bottomBar, Shadows.lg]}>
+      <View style={[styles.bottomBar, { backgroundColor: colors.card, borderTopColor: colors.border }, Shadows.lg]}>
         <View>
-          <Text style={styles.barTotalLabel}>Estimated Total</Text>
-          <Text style={styles.barTotalAmount}>{formatNaira(total)}</Text>
+          <Text style={[styles.barTotalLabel, { color: colors.textSecondary }]}>Estimated Total</Text>
+          <Text style={[styles.barTotalAmount, { color: colors.text }]}>{formatNaira(total)}</Text>
         </View>
 
         <TouchableOpacity

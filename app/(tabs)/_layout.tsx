@@ -4,10 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '@/src/constants/theme';
 import { useCart } from '@/src/context/CartContext';
 import { useAuth } from '@/src/context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function TabLayout() {
   const { totalCount } = useCart();
   const { user, isLoading } = useAuth();
+  const { colors } = useTheme();
 
   if (isLoading) {
     return null;
@@ -20,11 +22,11 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.light.textSecondary,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E2E8F0',
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
           height: 60,
           paddingBottom: 8,
           paddingTop: 6,
@@ -34,12 +36,12 @@ export default function TabLayout() {
           fontWeight: '600',
         },
         headerStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.card,
         },
         headerTitleStyle: {
           fontSize: 18,
           fontWeight: '700',
-          color: Colors.light.text,
+          color: colors.text,
         },
       }}
     >

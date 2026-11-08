@@ -10,30 +10,33 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Shadows } from '../src/constants/theme';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function AboutScreen() {
   const router = useRouter();
+  const { colors, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<'about' | 'terms' | 'privacy'>('about');
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Segmented Top Tabs */}
-      <View style={styles.tabBarWrapper}>
-        <View style={styles.tabBar}>
+      <View style={[styles.tabBarWrapper, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
+        <View style={[styles.tabBar, { backgroundColor: colors.subCard }]}>
           <TouchableOpacity
-            style={[styles.tabBtn, activeTab === 'about' && styles.tabBtnActive]}
+            style={[styles.tabBtn, activeTab === 'about' && [styles.tabBtnActive, { backgroundColor: colors.card }]]}
             onPress={() => setActiveTab('about')}
             activeOpacity={0.7}
           >
             <Ionicons
               name="information-circle"
               size={16}
-              color={activeTab === 'about' ? Colors.primary : Colors.light.textSecondary}
+              color={activeTab === 'about' ? Colors.primary : colors.textSecondary}
               style={{ marginRight: 6 }}
             />
             <Text
               style={[
                 styles.tabBtnText,
+                { color: colors.textSecondary },
                 activeTab === 'about' && styles.tabBtnTextActive,
               ]}
             >
@@ -42,19 +45,20 @@ export default function AboutScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tabBtn, activeTab === 'terms' && styles.tabBtnActive]}
+            style={[styles.tabBtn, activeTab === 'terms' && [styles.tabBtnActive, { backgroundColor: colors.card }]]}
             onPress={() => setActiveTab('terms')}
             activeOpacity={0.7}
           >
             <Ionicons
               name="document-text"
               size={16}
-              color={activeTab === 'terms' ? Colors.primary : Colors.light.textSecondary}
+              color={activeTab === 'terms' ? Colors.primary : colors.textSecondary}
               style={{ marginRight: 6 }}
             />
             <Text
               style={[
                 styles.tabBtnText,
+                { color: colors.textSecondary },
                 activeTab === 'terms' && styles.tabBtnTextActive,
               ]}
             >
@@ -63,19 +67,20 @@ export default function AboutScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tabBtn, activeTab === 'privacy' && styles.tabBtnActive]}
+            style={[styles.tabBtn, activeTab === 'privacy' && [styles.tabBtnActive, { backgroundColor: colors.card }]]}
             onPress={() => setActiveTab('privacy')}
             activeOpacity={0.7}
           >
             <Ionicons
               name="shield-checkmark"
               size={16}
-              color={activeTab === 'privacy' ? Colors.primary : Colors.light.textSecondary}
+              color={activeTab === 'privacy' ? Colors.primary : colors.textSecondary}
               style={{ marginRight: 6 }}
             />
             <Text
               style={[
                 styles.tabBtnText,
+                { color: colors.textSecondary },
                 activeTab === 'privacy' && styles.tabBtnTextActive,
               ]}
             >

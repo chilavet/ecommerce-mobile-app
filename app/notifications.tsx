@@ -12,8 +12,10 @@ import { router } from 'expo-router';
 
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useNotifications, AppNotification } from '@/src/context/NotificationContext';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function NotificationsScreen() {
+  const { colors, isDark } = useTheme();
   const {
     notifications,
     unreadCount,
@@ -75,11 +77,11 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Top Action Bar */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <View style={styles.badgeRow}>
-          <Text style={styles.badgeRowText}>
+          <Text style={[styles.badgeRowText, { color: colors.textSecondary }]}>
             {unreadCount > 0
               ? `${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}`
               : 'All caught up!'}
@@ -90,6 +92,7 @@ export default function NotificationsScreen() {
           <TouchableOpacity
             style={[
               styles.actionBtn,
+              { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' },
               unreadCount === 0 && styles.actionBtnDisabled,
             ]}
             onPress={handleMarkAllRead}
@@ -99,7 +102,7 @@ export default function NotificationsScreen() {
             <Ionicons
               name="checkmark-done-circle"
               size={18}
-              color={unreadCount > 0 ? Colors.primary : Colors.light.textMuted}
+              color={unreadCount > 0 ? Colors.primary : colors.textMuted}
             />
             <Text
               style={[
@@ -112,17 +115,17 @@ export default function NotificationsScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.settingsIconBtn}
+            style={[styles.settingsIconBtn, { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' }]}
             onPress={() => router.push('/notifications-settings')}
             activeOpacity={0.7}
           >
-            <Ionicons name="settings-outline" size={20} color={Colors.light.textSecondary} />
+            <Ionicons name="settings-outline" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
 
       {/* Filter Tabs */}
-      <View style={styles.filterBar}>
+      <View style={[styles.filterBar, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <TouchableOpacity
           style={[styles.filterTab, activeFilter === 'all' && styles.filterTabActive]}
           onPress={() => setActiveFilter('all')}
@@ -130,6 +133,7 @@ export default function NotificationsScreen() {
           <Text
             style={[
               styles.filterTabText,
+              { color: colors.textSecondary },
               activeFilter === 'all' && styles.filterTabTextActive,
             ]}
           >
@@ -144,6 +148,7 @@ export default function NotificationsScreen() {
           <Text
             style={[
               styles.filterTabText,
+              { color: colors.textSecondary },
               activeFilter === 'unread' && styles.filterTabTextActive,
             ]}
           >
@@ -169,17 +174,17 @@ export default function NotificationsScreen() {
       >
         {filteredNotifications.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <View style={styles.emptyIconCircle}>
+            <View style={[styles.emptyIconCircle, { backgroundColor: isDark ? '#1E293B' : '#F1F5F9' }]}>
               <Ionicons
                 name="notifications-off-outline"
                 size={48}
-                color={Colors.light.textMuted}
+                color={colors.textMuted}
               />
             </View>
-            <Text style={styles.emptyTitle}>
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
               {activeFilter === 'unread' ? 'No unread notifications' : 'No notifications'}
             </Text>
-            <Text style={styles.emptySubtitle}>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
               {activeFilter === 'unread'
                 ? 'You have read all your notifications. Switch to "All" to review past updates.'
                 : 'You are all caught up! Updates regarding your orders, discounts, and alerts will show here.'}
@@ -199,7 +204,8 @@ export default function NotificationsScreen() {
                 key={item.id}
                 style={[
                   styles.card,
-                  !item.read && styles.cardUnread,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                  !item.read && [styles.cardUnread, { borderColor: Colors.primary, backgroundColor: isDark ? '#1E293B' : '#F0F9FF' }],
                   Shadows.sm,
                 ]}
                 onPress={() => handleNotificationPress(item)}
@@ -209,7 +215,7 @@ export default function NotificationsScreen() {
                 <View
                   style={[
                     styles.typeIconContainer,
-                    { backgroundColor: iconConfig.bg },
+                    { backgroundColor: isDark ? '#334155' : iconConfig.bg },
                   ]}
                 >
                   <Ionicons name={iconConfig.name} size={22} color={iconConfig.color} />
@@ -221,16 +227,17 @@ export default function NotificationsScreen() {
                     <Text
                       style={[
                         styles.cardTitle,
+                        { color: colors.text },
                         !item.read && styles.cardTitleUnread,
                       ]}
                       numberOfLines={1}
                     >
                       {item.title}
                     </Text>
-                    <Text style={styles.timestamp}>{item.timestamp}</Text>
+                    <Text style={[styles.timestamp, { color: colors.textMuted }]}>{item.timestamp}</Text>
                   </View>
 
-                  <Text style={styles.cardBody} numberOfLines={3}>
+                  <Text style={[styles.cardBody, { color: colors.textSecondary }]} numberOfLines={3}>
                     {item.body}
                   </Text>
 
@@ -253,7 +260,7 @@ export default function NotificationsScreen() {
                     <Ionicons
                       name="close-outline"
                       size={18}
-                      color={Colors.light.textMuted}
+                      color={colors.textMuted}
                     />
                   </TouchableOpacity>
                 </View>

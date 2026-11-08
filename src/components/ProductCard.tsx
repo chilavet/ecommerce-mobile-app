@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Product } from '../types';
 import { Colors, BorderRadius, Shadows, Spacing } from '../constants/theme';
 import { useCart } from '../context/CartContext';
+import { useTheme } from '../context/ThemeContext';
 import { router } from 'expo-router';
 import { formatNaira } from '../utils/currency';
 
@@ -14,6 +15,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal }) => {
   const { addToCart } = useCart();
+  const { colors, isDark } = useTheme();
 
   const handlePress = () => {
     router.push({
@@ -28,26 +30,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
 
   if (horizontal) {
     return (
-      <Pressable onPress={handlePress} style={[styles.horizontalCard, Shadows.sm]}>
+      <Pressable
+        onPress={handlePress}
+        style={[styles.horizontalCard, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}
+      >
         <Image source={{ uri: product.imageUrl }} style={styles.horizontalImage} resizeMode="cover" />
         <View style={styles.horizontalContent}>
-          <Text style={styles.brand}>{product.brand}</Text>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={[styles.brand, { color: colors.textSecondary }]}>{product.brand}</Text>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
             {product.title}
           </Text>
           <View style={styles.ratingRow}>
             <Ionicons name="star" size={14} color={Colors.accent} />
-            <Text style={styles.ratingText}>{product.rating.toFixed(1)}</Text>
-            <Text style={styles.reviewsCount}>({product.reviewsCount})</Text>
+            <Text style={[styles.ratingText, { color: colors.text }]}>{product.rating.toFixed(1)}</Text>
+            <Text style={[styles.reviewsCount, { color: colors.textSecondary }]}>({product.reviewsCount})</Text>
           </View>
           {product.distanceMiles !== undefined && (
             <View style={styles.distanceRow}>
-              <Ionicons name="location-sharp" size={11} color={Colors.primary} />
-              <Text style={styles.distanceText}>{product.distanceMiles.toFixed(1)} mi</Text>
+              <Ionicons name="location-sharp" size={11} color={colors.primary} />
+              <Text style={[styles.distanceText, { color: colors.primary }]}>{product.distanceMiles.toFixed(1)} mi</Text>
             </View>
           )}
           <View style={styles.priceRow}>
-            <Text style={styles.price}>{formatNaira(product.price)}</Text>
+            <Text style={[styles.price, { color: colors.primary }]}>{formatNaira(product.price)}</Text>
             <TouchableOpacity
               onPress={() => addToCart(product, 1)}
               style={styles.smallAddButton}
@@ -62,8 +67,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
   }
 
   return (
-    <Pressable onPress={handlePress} style={[styles.card, Shadows.md]}>
-      <View style={styles.imageContainer}>
+    <Pressable
+      onPress={handlePress}
+      style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.md]}
+    >
+      <View style={[styles.imageContainer, { backgroundColor: isDark ? '#1E293B' : '#F8FAFC' }]}>
         <Image source={{ uri: product.imageUrl }} style={styles.image} resizeMode="cover" />
         {discountPercent > 0 && (
           <View style={styles.badge}>
@@ -78,34 +86,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, horizontal })
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.brand}>{product.brand}</Text>
-        <Text style={styles.title} numberOfLines={2}>
+        <Text style={[styles.brand, { color: colors.textSecondary }]}>{product.brand}</Text>
+        <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>
           {product.title}
         </Text>
 
         <View style={styles.ratingRow}>
           <Ionicons name="star" size={14} color={Colors.accent} />
-          <Text style={styles.ratingText}>{product.rating.toFixed(1)}</Text>
-          <Text style={styles.reviewsCount}>({product.reviewsCount})</Text>
+          <Text style={[styles.ratingText, { color: colors.text }]}>{product.rating.toFixed(1)}</Text>
+          <Text style={[styles.reviewsCount, { color: colors.textSecondary }]}>({product.reviewsCount})</Text>
         </View>
 
         {product.distanceMiles !== undefined && (
-          <View style={styles.distanceBadge}>
-            <Ionicons name="location-sharp" size={12} color={Colors.primary} />
-            <Text style={styles.distanceText}>
+          <View style={[styles.distanceBadge, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
+            <Ionicons name="location-sharp" size={12} color={colors.primary} />
+            <Text style={[styles.distanceText, { color: colors.primary }]}>
               {product.distanceMiles.toFixed(1)} mi away
             </Text>
             {product.location?.city && (
-              <Text style={styles.distanceCity}> • {product.location.city}</Text>
+              <Text style={[styles.distanceCity, { color: colors.textSecondary }]}> • {product.location.city}</Text>
             )}
           </View>
         )}
 
         <View style={styles.priceRow}>
           <View>
-            <Text style={styles.price}>{formatNaira(product.price)}</Text>
+            <Text style={[styles.price, { color: colors.primary }]}>{formatNaira(product.price)}</Text>
             {product.originalPrice && (
-              <Text style={styles.originalPrice}>{formatNaira(product.originalPrice)}</Text>
+              <Text style={[styles.originalPrice, { color: colors.textMuted }]}>{formatNaira(product.originalPrice)}</Text>
             )}
           </View>
 

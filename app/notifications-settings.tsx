@@ -15,8 +15,10 @@ import { Stack } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Shadows } from '@/src/constants/theme';
 import { useNotifications } from '@/src/context/NotificationContext';
 import { useAuth } from '@/src/context/AuthContext';
+import { useTheme } from '@/src/context/ThemeContext';
 
 export default function NotificationSettingsScreen() {
+  const { colors, isDark } = useTheme();
   const { preferences, updatePreferences, sendTestPush, sendTestEmail } = useNotifications();
   const { user } = useAuth();
 
@@ -60,7 +62,7 @@ export default function NotificationSettingsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen
         options={{
           title: 'Notification Settings',
@@ -70,24 +72,24 @@ export default function NotificationSettingsScreen() {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Section 1: Push Notifications */}
-        <View style={[styles.card, Shadows.sm]}>
+        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
           <View style={styles.cardHeader}>
-            <View style={styles.iconCircle}>
+            <View style={[styles.iconCircle, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF' }]}>
               <Ionicons name="notifications" size={22} color={Colors.primary} />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.cardTitle}>Push Notifications</Text>
-              <Text style={styles.cardSubtitle}>Real-time alerts directly on your device</Text>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Push Notifications</Text>
+              <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>Real-time alerts directly on your device</Text>
             </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
           {/* Master Switch */}
           <View style={styles.masterRow}>
             <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={styles.masterLabel}>Allow Push Notifications</Text>
-              <Text style={styles.masterSubtitle}>Enable or mute all instant device alerts</Text>
+              <Text style={[styles.masterLabel, { color: colors.text }]}>Allow Push Notifications</Text>
+              <Text style={[styles.masterSubtitle, { color: colors.textSecondary }]}>Enable or mute all instant device alerts</Text>
             </View>
             <Switch
               value={preferences.pushEnabled}
@@ -101,8 +103,8 @@ export default function NotificationSettingsScreen() {
           <View style={[styles.subOptionsContainer, !preferences.pushEnabled && styles.disabledSection]}>
             <View style={styles.subOptionRow}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.optionLabel}>Order Status & Tracking</Text>
-                <Text style={styles.optionDescription}>
+                <Text style={[styles.optionLabel, { color: colors.text }]}>Order Status & Tracking</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
                   Get notified when orders are placed, dispatched, and delivered.
                 </Text>
               </View>
@@ -117,8 +119,8 @@ export default function NotificationSettingsScreen() {
 
             <View style={styles.subOptionRow}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.optionLabel}>Deals & Flash Sales</Text>
-                <Text style={styles.optionDescription}>
+                <Text style={[styles.optionLabel, { color: colors.text }]}>Deals & Flash Sales</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
                   Exclusive coupon codes, price drops, and seasonal sales.
                 </Text>
               </View>
@@ -133,8 +135,8 @@ export default function NotificationSettingsScreen() {
 
             <View style={styles.subOptionRow}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.optionLabel}>Cart Reminders</Text>
-                <Text style={styles.optionDescription}>
+                <Text style={[styles.optionLabel, { color: colors.text }]}>Cart Reminders</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
                   Gentle reminders when items remain in your shopping bag.
                 </Text>
               </View>
@@ -149,7 +151,7 @@ export default function NotificationSettingsScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.testBtn, !preferences.pushEnabled && styles.testBtnDisabled]}
+            style={[styles.testBtn, { backgroundColor: isDark ? '#1E293B' : '#EFF6FF', borderColor: isDark ? '#334155' : '#BFDBFE' }, !preferences.pushEnabled && styles.testBtnDisabled]}
             onPress={handleTestPush}
             disabled={sendingPush || !preferences.pushEnabled}
             activeOpacity={0.8}
@@ -161,13 +163,13 @@ export default function NotificationSettingsScreen() {
                 <Ionicons
                   name="paper-plane-outline"
                   size={16}
-                  color={preferences.pushEnabled ? Colors.primary : Colors.light.textMuted}
+                  color={preferences.pushEnabled ? Colors.primary : colors.textMuted}
                   style={{ marginRight: 6 }}
                 />
                 <Text
                   style={[
                     styles.testBtnText,
-                    !preferences.pushEnabled && { color: Colors.light.textMuted },
+                    !preferences.pushEnabled && { color: colors.textMuted },
                   ]}
                 >
                   Send Test Push Notification
@@ -178,26 +180,26 @@ export default function NotificationSettingsScreen() {
         </View>
 
         {/* Section 2: Email Notifications */}
-        <View style={[styles.card, Shadows.sm]}>
+        <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }, Shadows.sm]}>
           <View style={styles.cardHeader}>
-            <View style={[styles.iconCircle, { backgroundColor: '#DCFCE7' }]}>
+            <View style={[styles.iconCircle, { backgroundColor: isDark ? '#064E3B' : '#DCFCE7' }]}>
               <Ionicons name="mail" size={22} color={Colors.secondary} />
             </View>
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.cardTitle}>Email Notifications</Text>
-              <Text style={styles.cardSubtitle}>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Email Notifications</Text>
+              <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
                 Sent to: {user?.email || 'alex@example.com'}
               </Text>
             </View>
           </View>
 
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.divider }]} />
 
           {/* Master Email Switch */}
           <View style={styles.masterRow}>
             <View style={{ flex: 1, marginRight: 10 }}>
-              <Text style={styles.masterLabel}>Allow Email Notifications</Text>
-              <Text style={styles.masterSubtitle}>Control emails sent to your inbox</Text>
+              <Text style={[styles.masterLabel, { color: colors.text }]}>Allow Email Notifications</Text>
+              <Text style={[styles.masterSubtitle, { color: colors.textSecondary }]}>Control emails sent to your inbox</Text>
             </View>
             <Switch
               value={preferences.emailEnabled}
@@ -210,8 +212,8 @@ export default function NotificationSettingsScreen() {
           <View style={[styles.subOptionsContainer, !preferences.emailEnabled && styles.disabledSection]}>
             <View style={styles.subOptionRow}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.optionLabel}>Order Receipts & Invoices</Text>
-                <Text style={styles.optionDescription}>
+                <Text style={[styles.optionLabel, { color: colors.text }]}>Order Receipts & Invoices</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
                   Detailed breakdown, tracking link, and tax invoice for each order.
                 </Text>
               </View>
@@ -226,8 +228,8 @@ export default function NotificationSettingsScreen() {
 
             <View style={styles.subOptionRow}>
               <View style={{ flex: 1, marginRight: 10 }}>
-                <Text style={styles.optionLabel}>Weekly Deals & Recommendations</Text>
-                <Text style={styles.optionDescription}>
+                <Text style={[styles.optionLabel, { color: colors.text }]}>Weekly Deals & Recommendations</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>
                   Top-rated arrivals and tailored recommendations once a week.
                 </Text>
               </View>
@@ -242,7 +244,7 @@ export default function NotificationSettingsScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.testBtn, !preferences.emailEnabled && styles.testBtnDisabled]}
+            style={[styles.testBtn, { backgroundColor: isDark ? '#064E3B' : '#ECFDF5', borderColor: isDark ? '#047857' : '#A7F3D0' }, !preferences.emailEnabled && styles.testBtnDisabled]}
             onPress={handleTestEmail}
             disabled={sendingEmail || !preferences.emailEnabled}
             activeOpacity={0.8}
