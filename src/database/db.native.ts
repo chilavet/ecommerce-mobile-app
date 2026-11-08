@@ -202,6 +202,13 @@ export async function getProducts(options?: {
 }): Promise<Product[]> {
   const { categoryId, query, featuredOnly, sortBy } = options || {};
 
+  // Ensure all seed products are present in memoryStore
+  for (const prod of SEED_PRODUCTS) {
+    if (!memoryStore.products.some(p => p.id === prod.id)) {
+      memoryStore.products.push(prod);
+    }
+  }
+
   if (useFallback || !dbInstance) {
     let result = [...memoryStore.products];
     if (categoryId && categoryId !== 'cat_all') {
@@ -259,13 +266,18 @@ export async function getProducts(options?: {
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
+  const seedProd = SEED_PRODUCTS.find(p => p.id === id);
+  if (seedProd && !memoryStore.products.some(p => p.id === id)) {
+    memoryStore.products.push(seedProd);
+  }
+
   if (useFallback || !dbInstance) {
     return memoryStore.products.find(p => p.id === id) || null;
   }
 
   try {
     const row = dbInstance.getFirstSync('SELECT * FROM products WHERE id = ?', [id]);
-    if (!row) return null;
+    if (!row) return memoryStore.products.find(p => p.id === id) || null;
     return mapRowToProduct(row);
   } catch {
     return memoryStore.products.find(p => p.id === id) || null;
@@ -273,8 +285,17 @@ export async function getProductById(id: string): Promise<Product | null> {
 }
 
 export async function getCategories(): Promise<Category[]> {
+  for (const cat of SEED_CATEGORIES) {
+    if (!memoryStore.categories.some(c => c.id === cat.id)) {
+      memoryStore.categories.push(cat);
+    }
+  }
+
   if (useFallback || !dbInstance) {
-    return [...memoryStore.categories];
+    return SEED_CATEGORIES.map(seedCat => {
+      const existing = memoryStore.categories.find(c => c.id === seedCat.id);
+      return existing || seedCat;
+    });
   }
 
   try {
@@ -287,7 +308,10 @@ export async function getCategories(): Promise<Category[]> {
       itemCount: r.item_count,
     }));
   } catch {
-    return [...memoryStore.categories];
+    return SEED_CATEGORIES.map(seedCat => {
+      const existing = memoryStore.categories.find(c => c.id === seedCat.id);
+      return existing || seedCat;
+    });
   }
 }
 

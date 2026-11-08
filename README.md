@@ -7,7 +7,7 @@ A high-performance cross-platform mobile e-commerce application built with **Rea
 ## 📱 Features
 
 - **🛍️ Product Discovery & Catalog**:
-  - Category filtering (Electronics, Fashion, Home & Living, Audio & Gear).
+  - Category filtering (Food, Pharmacy, Electronics, Fashion, Home & Living, Audio & Gear).
   - Live debounced search across brands, titles, categories, and tags.
   - Sorting by Popularity, Top Rated, Price: Low to High, and Price: High to Low.
   - Promotional hero discounts with coupon code integration.
@@ -15,7 +15,6 @@ A high-performance cross-platform mobile e-commerce application built with **Rea
 - **🔍 Product Detail View**:
   - Image gallery with interactive thumbnail selector.
   - Rating breakdown, verified review count, and real-time stock indicator.
-  - Comprehensive technical specifications table.
   - Interactive quantity stepper, "Add to Cart", and instant "Buy Now" flow.
 
 - **🛒 Shopping Cart & Checkout**:

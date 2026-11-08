@@ -99,6 +99,13 @@ export async function getProducts(options?: {
   sortBy?: 'price-asc' | 'price-desc' | 'rating' | 'popular';
 }): Promise<Product[]> {
   const { categoryId, query, featuredOnly, sortBy } = options || {};
+
+  for (const prod of SEED_PRODUCTS) {
+    if (!memoryStore.products.some(p => p.id === prod.id)) {
+      memoryStore.products.push(prod);
+    }
+  }
+
   let result = [...memoryStore.products];
 
   if (categoryId && categoryId !== 'cat_all') {
@@ -128,11 +135,23 @@ export async function getProducts(options?: {
 }
 
 export async function getProductById(id: string): Promise<Product | null> {
+  const seedProd = SEED_PRODUCTS.find(p => p.id === id);
+  if (seedProd && !memoryStore.products.some(p => p.id === id)) {
+    memoryStore.products.push(seedProd);
+  }
   return memoryStore.products.find(p => p.id === id) || null;
 }
 
 export async function getCategories(): Promise<Category[]> {
-  return [...memoryStore.categories];
+  for (const cat of SEED_CATEGORIES) {
+    if (!memoryStore.categories.some(c => c.id === cat.id)) {
+      memoryStore.categories.push(cat);
+    }
+  }
+  return SEED_CATEGORIES.map(seedCat => {
+    const existing = memoryStore.categories.find(c => c.id === seedCat.id);
+    return existing || seedCat;
+  });
 }
 
 export async function getUserByEmail(email: string): Promise<(User & { password?: string }) | null> {
