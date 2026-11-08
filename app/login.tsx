@@ -130,11 +130,8 @@ export default function LoginScreen() {
           </View>
 
           <Text style={styles.brandTitle}>ShopPulse</Text>
-          <View style={styles.countryBadge}>
-            <Text style={styles.countryBadgeText}>🇳🇬 Nigeria's E-Commerce Hub</Text>
-          </View>
           <Text style={styles.brandSubtitle}>
-            Fast, secure shopping with Naira currency &amp; Paystack payment
+            Fast, simple, and secure mobile shopping
           </Text>
         </View>
 
@@ -255,7 +252,7 @@ export default function LoginScreen() {
         <View style={styles.footerSecurity}>
           <Ionicons name="shield-checkmark" size={16} color="#059669" />
           <Text style={styles.footerSecurityText}>
-            256-bit SSL Security • Paystack Certified Partner
+            256-bit SSL Security • Encrypted Login
           </Text>
         </View>
       </ScrollView>
@@ -301,20 +298,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#0F172A',
     letterSpacing: -0.5,
-  },
-  countryBadge: {
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: BorderRadius.full,
-    marginTop: 6,
-    borderWidth: 1,
-    borderColor: '#A7F3D0',
-  },
-  countryBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#047857',
   },
   brandSubtitle: {
     fontSize: 13,
