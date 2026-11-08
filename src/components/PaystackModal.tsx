@@ -33,7 +33,7 @@ interface PaystackModalProps {
   onClose: () => void;
 }
 
-type PaystackChannel = 'card' | 'transfer' | 'ussd';
+type PaystackChannel = 'card' | 'transfer';
 
 export function PaystackModal({
   visible,
@@ -59,9 +59,6 @@ export function PaystackModal({
   // Success state
   const [isSuccess, setIsSuccess] = useState(false);
   const [confirmedRef, setConfirmedRef] = useState('');
-
-  // Selected Bank for USSD
-  const [selectedBank, setSelectedBank] = useState('GTBank (*737#)');
 
   useEffect(() => {
     if (visible) {
@@ -181,15 +178,6 @@ export function PaystackModal({
       setIsProcessing(false);
       completePayment('bank_transfer');
     }, 1500);
-  };
-
-  // Handle USSD confirmation
-  const handleUssdPayment = () => {
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      completePayment('ussd');
-    }, 1200);
   };
 
   const completePayment = (usedChannel: string, last4?: string, brand?: string) => {
@@ -380,20 +368,6 @@ export function PaystackModal({
                     Transfer
                   </Text>
                 </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.channelTab, channel === 'ussd' && styles.channelTabActive]}
-                  onPress={() => setChannel('ussd')}
-                >
-                  <Ionicons
-                    name="phone-portrait"
-                    size={16}
-                    color={channel === 'ussd' ? '#0BA4DB' : '#64748B'}
-                  />
-                  <Text style={[styles.channelTabText, channel === 'ussd' && styles.channelTabTextActive]}>
-                    USSD
-                  </Text>
-                </TouchableOpacity>
               </View>
 
               {/* Channel 1: Card */}
@@ -549,54 +523,6 @@ export function PaystackModal({
                       <>
                         <Ionicons name="checkmark-circle" size={16} color="#FFFFFF" />
                         <Text style={styles.payBtnText}>I Have Sent the Money</Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              )}
-
-              {/* Channel 3: USSD */}
-              {channel === 'ussd' && (
-                <View style={styles.tabContent}>
-                  <Text style={styles.inputLabel}>CHOOSE YOUR BANK</Text>
-                  {['GTBank (*737#)', 'Access Bank (*901#)', 'Zenith Bank (*966#)', 'UBA (*919#)'].map(b => (
-                    <TouchableOpacity
-                      key={b}
-                      style={[styles.bankChoice, selectedBank === b && styles.bankChoiceActive]}
-                      onPress={() => setSelectedBank(b)}
-                    >
-                      <Ionicons
-                        name={selectedBank === b ? 'radio-button-on' : 'radio-button-off'}
-                        size={18}
-                        color={selectedBank === b ? '#0BA4DB' : '#94A3B8'}
-                      />
-                      <Text style={[styles.bankChoiceText, selectedBank === b && styles.bankChoiceTextActive]}>
-                        {b}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-
-                  <View style={styles.ussdDialBox}>
-                    <Text style={styles.ussdDialCode}>
-                      {selectedBank.includes('737') ? '*737*50*125#' : '*901*000*125#'}
-                    </Text>
-                    <Text style={styles.ussdDialLabel}>
-                      Dial this USSD code on your mobile phone to complete payment.
-                    </Text>
-                  </View>
-
-                  <TouchableOpacity
-                    style={[styles.payBtn, isProcessing && styles.payBtnDisabled]}
-                    onPress={handleUssdPayment}
-                    disabled={isProcessing}
-                    activeOpacity={0.8}
-                  >
-                    {isProcessing ? (
-                      <ActivityIndicator color="#FFFFFF" size="small" />
-                    ) : (
-                      <>
-                        <Ionicons name="checkmark-done" size={16} color="#FFFFFF" />
-                        <Text style={styles.payBtnText}>Verify USSD Payment</Text>
                       </>
                     )}
                   </TouchableOpacity>
@@ -890,49 +816,6 @@ const styles = StyleSheet.create({
     color: '#64748B',
     lineHeight: 18,
     marginVertical: 14,
-  },
-  bankChoice: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: BorderRadius.md,
-    padding: 12,
-    marginBottom: 8,
-    gap: 10,
-  },
-  bankChoiceActive: {
-    borderColor: '#0BA4DB',
-    backgroundColor: '#F0F9FF',
-  },
-  bankChoiceText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#334155',
-  },
-  bankChoiceTextActive: {
-    color: '#0BA4DB',
-    fontWeight: '700',
-  },
-  ussdDialBox: {
-    backgroundColor: '#F1F5F9',
-    borderRadius: BorderRadius.md,
-    padding: 14,
-    alignItems: 'center',
-    marginVertical: 12,
-  },
-  ussdDialCode: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: '#0BA4DB',
-    letterSpacing: 1,
-  },
-  ussdDialLabel: {
-    fontSize: 11,
-    color: '#64748B',
-    marginTop: 4,
-    textAlign: 'center',
   },
   securityFooter: {
     flexDirection: 'row',

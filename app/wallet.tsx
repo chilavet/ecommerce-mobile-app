@@ -45,7 +45,7 @@ export default function WalletScreen() {
     if (preset) {
       setTopUpAmount(preset.toString());
     } else {
-      setTopUpAmount('');
+      setTopUpAmount('10000');
     }
     setFundModalVisible(true);
   };
@@ -137,7 +137,7 @@ export default function WalletScreen() {
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.fundBtnTitle}>Fund Wallet</Text>
-            <Text style={styles.fundBtnSub}>Deposit with Card, Bank Transfer or USSD</Text>
+            <Text style={styles.fundBtnSub}>Deposit with Card or Bank Transfer</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color="#FFFFFF" />
         </TouchableOpacity>
