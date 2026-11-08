@@ -17,7 +17,6 @@ import { getProducts, getCategories } from '@/src/database/db';
 import { ProductCard } from '@/src/components/ProductCard';
 import { CategoryPill } from '@/src/components/CategoryPill';
 import { SearchBar } from '@/src/components/SearchBar';
-import { LocationPickerModal } from '@/src/components/LocationPickerModal';
 import { useAuth } from '@/src/context/AuthContext';
 import { useNotifications } from '@/src/context/NotificationContext';
 import { useLocation } from '@/src/context/LocationContext';
@@ -36,7 +35,6 @@ export default function ShopHomeScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('cat_all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortByDistance, setSortByDistance] = useState<boolean>(true);
-  const [locationModalVisible, setLocationModalVisible] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -80,22 +78,6 @@ export default function ShopHomeScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        {/* Top Location Indicator */}
-        <View style={styles.topLocationBar}>
-          <TouchableOpacity
-            style={styles.locationIndicator}
-            onPress={() => setLocationModalVisible(true)}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="location-sharp" size={15} color={colors.primary} />
-            <Text style={[styles.deliverToLabel, { color: colors.textSecondary }]}>Deliver to:</Text>
-            <Text style={[styles.selectedAreaText, { color: colors.text }]} numberOfLines={1}>
-              {currentLocation.city || currentLocation.name}
-            </Text>
-            <Ionicons name="chevron-down" size={13} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-
         {/* Header Greeting & Notifications */}
         <View style={styles.header}>
           <View>
@@ -215,12 +197,6 @@ export default function ShopHomeScreen() {
           )}
         </View>
       </ScrollView>
-
-      {/* Location Picker Modal */}
-      <LocationPickerModal
-        visible={locationModalVisible}
-        onClose={() => setLocationModalVisible(false)}
-      />
     </View>
   );
 }
@@ -233,30 +209,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     padding: Spacing.md,
     paddingBottom: 40,
-  },
-  topLocationBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.xs,
-    paddingVertical: 2,
-  },
-  locationIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 2,
-  },
-  deliverToLabel: {
-    fontSize: 12,
-    color: Colors.light.textSecondary,
-    fontWeight: '400',
-  },
-  selectedAreaText: {
-    fontSize: 13,
-    color: Colors.light.text,
-    fontWeight: '600',
-    maxWidth: 240,
   },
   header: {
     flexDirection: 'row',
